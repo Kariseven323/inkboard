@@ -1,0 +1,40 @@
+- Must use simplified chinese
+- Must clarify the user's intention instead of speculating about it
+- Must use context7 to look up the latest documentation and code for any library
+- Must use sequential thinking to analyze and solve complex problems
+- Must activate the current dir as project using serena unless the project contains only documentation and no programming language
+- Must use `remove_project` (optional) when you need to drop an outdated project from the configuration
+- Must call `switch_modes` (optional) when switching to specific working modes such as `planning` or `editing`
+- Must call `get_current_config` to quickly inspect the active project, contexts, and tool availability
+- Must use `write_memory` to capture key information for future reference
+- Must use `read_memory` when you need to revisit existing notes
+- Must call `list_memories` first if you want to review which memories are available
+- Must use `delete_memory` to remove obsolete or explicitly deprecated memories
+- Must call `check_onboarding_performed` before starting tasks to confirm the onboarding checklist is complete
+- Must call `onboarding` to obtain initial project guidance if onboarding has not been run
+- Must call `think_about_collected_information` when extensive searching leaves you unsure about completeness
+- Must call `think_about_task_adherence` if you suspect you are drifting away from the task goal
+- Must call `think_about_whether_you_are_done` to verify every requirement is satisfied before wrapping up
+- Must call `summarize_changes` (optional) to gather instructions for documenting completed work
+- Must use `prepare_for_new_conversation` when the user requests a reset for a new discussion
+- Must call `initial_instructions` (optional, works even without an active project) if the client lacks system instructions
+- Must call `read_file` to inspect an entire file or a specific line range
+- Must use `create_text_file` when you need to create or overwrite a text file
+- Must use `list_dir` to understand directory structure and discover files
+- Must use `find_file` for wildcard-based filename searches
+- Must prefer `replace_regex` when symbol-level tools do not fit and regex-based replacement is required
+- Must use `delete_lines` (optional, can edit) to remove line ranges that were previously read
+- Must use `replace_lines` (optional, can edit) to substitute line ranges with new content
+- Must use `insert_at_line` (optional, can edit) to insert text before a specific line
+- Must call `search_for_pattern` to run multi-file regex searches with optional context control
+- Must call `restart_language_server` (optional) when the language server gets out of sync or stuck
+- Must call `get_symbols_overview` to obtain a top-level symbol map for a file
+- Must use `find_symbol` to locate definitions by symbol name or path
+- Must use `find_referencing_symbols` to track where a symbol is referenced
+- Must call `replace_symbol_body` (can edit) to replace an entire symbol body while preserving its container
+- Must call `insert_after_symbol` (can edit) to append code after an existing symbol definition
+- Must call `insert_before_symbol` (can edit) to insert code or imports before an existing symbol definition
+- Must call `execute_shell_command` (can edit) to run safe shell commands within the project for diagnostics or scripts
+- Must update the relevant documentation in a timely manner after completing the overall coding task
+- Must not arbitrarily add functions beyond the user requirement functions, except for the prerequisite functions needed to fulfill user requirements
+- Must use frequently updated libraries instead of those that haven't been updated for a long time when determining which libraries to use during technical planning
