@@ -38,3 +38,4 @@
 - Must update the relevant documentation in a timely manner after completing the overall coding task
 - Must not arbitrarily add functions beyond the user requirement functions, except for the prerequisite functions needed to fulfill user requirements
 - Must use frequently updated libraries instead of those that haven't been updated for a long time when determining which libraries to use during technical planning
+- Must read the documentation related to specific development tasks before development
