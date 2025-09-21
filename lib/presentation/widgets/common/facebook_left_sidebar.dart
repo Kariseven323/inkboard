@@ -24,33 +24,33 @@ class FacebookLeftSidebar extends StatelessWidget {
               padding: EdgeInsets.zero,
               children: [
                 _buildNavigationItem(
-                  icon: Icons.home,
+                  icon: Icons.home_outlined,
                   title: '主页',
                   isActive: true,
                   onTap: () {},
                 ),
                 _buildNavigationItem(
-                  icon: Icons.book,
+                  icon: Icons.edit_note_outlined,
                   title: '我的日记',
                   onTap: () {},
                 ),
                 _buildNavigationItem(
-                  icon: Icons.label,
+                  icon: Icons.local_offer_outlined,
                   title: '标签管理',
                   onTap: () {},
                 ),
                 _buildNavigationItem(
-                  icon: Icons.star,
+                  icon: Icons.favorite_border_outlined,
                   title: '收藏夹',
                   onTap: () {},
                 ),
                 _buildNavigationItem(
-                  icon: Icons.analytics,
+                  icon: Icons.analytics_outlined,
                   title: '统计分析',
                   onTap: () {},
                 ),
                 _buildNavigationItem(
-                  icon: Icons.search,
+                  icon: Icons.search_outlined,
                   title: '高级搜索',
                   onTap: () {},
                 ),
@@ -65,21 +65,24 @@ class FacebookLeftSidebar extends StatelessWidget {
                 ),
 
                 _buildNavigationItem(
-                  icon: Icons.file_download,
+                  icon: Icons.file_download_outlined,
                   title: '导出数据',
                   onTap: () {},
                 ),
                 _buildNavigationItem(
-                  icon: Icons.settings,
+                  icon: Icons.settings_outlined,
                   title: '设置',
                   onTap: () {},
                 ),
+
+                // 底部信息移入可滚动区域，避免整体高度溢出
+                SizedBox(height: 8),
+                _buildBottomInfo(),
               ],
             ),
           ),
-
-          // 底部信息
-          _buildBottomInfo(),
+          // 底部留白
+          SizedBox(height: 8),
         ],
       ),
     );
@@ -88,37 +91,56 @@ class FacebookLeftSidebar extends StatelessWidget {
   /// 构建用户资料信息
   Widget _buildUserProfile() {
     return Container(
-      padding: FacebookSizes.paddingAll,
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: FacebookSizes.avatarMedium / 2,
+      padding: const EdgeInsets.all(12),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final avatar = const CircleAvatar(
+            radius: 20.0,
             backgroundColor: FacebookColors.primary,
             child: Icon(
               Icons.person,
               color: FacebookColors.textOnPrimary,
-              size: FacebookSizes.iconLarge,
+              size: 20.0,
             ),
-          ),
-          SizedBox(width: FacebookSizes.spacing12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          );
+
+          final texts = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '用户名',
+                style: FacebookTextStyles.username,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                '编辑资料',
+                style: FacebookTextStyles.caption.copyWith(
+                  color: FacebookColors.primary,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          );
+
+          if (constraints.maxWidth < 160) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  '用户名',
-                  style: FacebookTextStyles.username,
-                ),
-                Text(
-                  '编辑资料',
-                  style: FacebookTextStyles.caption.copyWith(
-                    color: FacebookColors.primary,
-                  ),
-                ),
+                Center(child: avatar),
+                const SizedBox(height: 8),
+                texts,
               ],
-            ),
-          ),
-        ],
+            );
+          }
+
+          return Row(
+            children: [
+              avatar,
+              const SizedBox(width: 12),
+              Expanded(child: texts),
+            ],
+          );
+        },
       ),
     );
   }
@@ -131,54 +153,72 @@ class FacebookLeftSidebar extends StatelessWidget {
     VoidCallback? onTap,
     Widget? trailing,
   }) {
-    return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: FacebookSizes.spacing8,
-        vertical: FacebookSizes.spacing2,
-      ),
-      child: Material(
-        color: isActive
-            ? FacebookColors.primary.withValues(alpha: 0.1)
-            : Colors.transparent,
-        borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
-        child: InkWell(
-          onTap: onTap,
+    return LayoutBuilder(builder: (context, constraints) {
+      final compact = constraints.maxWidth < 160;
+      final horizontalPadding = compact ? 8.0 : FacebookSizes.spacing12;
+      final verticalPadding = compact ? 8.0 : FacebookSizes.spacing12;
+
+      return Container(
+        margin: EdgeInsets.symmetric(
+          horizontal: FacebookSizes.spacing8,
+          vertical: FacebookSizes.spacing2,
+        ),
+        child: Material(
+          color: isActive
+              ? FacebookColors.primary.withValues(alpha: 0.1)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: FacebookSizes.spacing12,
-              vertical: FacebookSizes.spacing12,
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  icon,
-                  color: isActive
-                      ? FacebookColors.primary
-                      : FacebookColors.iconGray,
-                  size: FacebookSizes.iconMedium,
-                ),
-                SizedBox(width: FacebookSizes.spacing12),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: FacebookTextStyles.bodyMedium.copyWith(
-                      color: isActive
-                          ? FacebookColors.primary
-                          : FacebookColors.textPrimary,
-                      fontWeight: isActive
-                          ? FontWeight.w600
-                          : FontWeight.normal,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: horizontalPadding,
+                vertical: verticalPadding,
+              ),
+              child: compact
+                  ? Center(
+                      child: Icon(
+                        icon,
+                        color: isActive
+                            ? FacebookColors.primary
+                            : FacebookColors.iconGray,
+                        size: 18.0,
+                      ),
+                    )
+                  : Row(
+                      children: [
+                        Icon(
+                          icon,
+                          color: isActive
+                              ? FacebookColors.primary
+                              : FacebookColors.iconGray,
+                          size: compact ? 18.0 : FacebookSizes.iconMedium,
+                        ),
+                        SizedBox(width: FacebookSizes.spacing12),
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: FacebookTextStyles.bodyMedium.copyWith(
+                              color: isActive
+                                  ? FacebookColors.primary
+                                  : FacebookColors.textPrimary,
+                              fontWeight: isActive
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                        if (trailing != null) trailing,
+                      ],
                     ),
-                  ),
-                ),
-                if (trailing != null) trailing,
-              ],
             ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   /// 构建底部信息

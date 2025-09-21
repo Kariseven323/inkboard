@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/theme/facebook_colors.dart';
 import '../../../core/theme/facebook_sizes.dart';
 import '../../../core/theme/facebook_text_styles.dart';
@@ -62,7 +61,7 @@ class FacebookRightSidebar extends StatelessWidget {
         Text(
           title,
           style: FacebookTextStyles.headline6.copyWith(
-            fontSize: 16.sp,
+            fontSize: 16,
           ),
         ),
         SizedBox(height: FacebookSizes.spacing12),
@@ -92,8 +91,8 @@ class FacebookRightSidebar extends StatelessWidget {
                 child: Row(
                   children: [
                     Container(
-                      width: 8.w,
-                      height: 8.w,
+                      width: 8,
+                      height: 8,
                       decoration: BoxDecoration(
                         color: FacebookColors.primary,
                         shape: BoxShape.circle,

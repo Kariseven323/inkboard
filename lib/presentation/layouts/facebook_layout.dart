@@ -49,6 +49,7 @@ class FacebookLayout extends StatelessWidget {
       title: Row(
         children: [
           // Facebook logo
+          // Facebook Logo（蓝底白 f 文字符号，避免重复Icon匹配）
           Container(
             width: 32.w,
             height: 32.w,
@@ -56,48 +57,31 @@ class FacebookLayout extends StatelessWidget {
               color: FacebookColors.textOnPrimary,
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.facebook,
-              color: FacebookColors.primary,
-              size: FacebookSizes.iconMedium,
+            alignment: Alignment.center,
+            child: const Text(
+              'f',
+              key: Key('appbar_fb_icon'),
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w900,
+                color: FacebookColors.primary,
+                height: 1,
+              ),
             ),
           ),
           SizedBox(width: FacebookSizes.spacing12),
 
-          // 搜索框
-          Expanded(
-            child: Container(
-              height: 36.h,
-              constraints: BoxConstraints(maxWidth: 240.w),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: '搜索日记内容...',
-                  prefixIcon: Icon(
-                    Icons.search,
-                    size: FacebookSizes.iconSmall,
-                    color: FacebookColors.iconGray,
-                  ),
-                  filled: true,
-                  fillColor: FacebookColors.inputBackground,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(FacebookSizes.radiusRound),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: FacebookSizes.spacing12,
-                    vertical: FacebookSizes.spacing8,
-                  ),
-                ),
-              ),
-            ),
+          // 搜索框（提取为可悬停/聚焦的组件）
+          const Expanded(
+            child: _NavSearchField(),
           ),
         ],
       ),
       actions: [
-        // 右侧图标按钮
-        _buildIconButton(Icons.home, () {}),
-        _buildIconButton(Icons.notifications, () {}),
-        _buildIconButton(Icons.settings, () {}),
+        // 右侧图标按钮（36px圆形，悬停#F0F2F5）
+        _fbIconButton(Icons.home_outlined, () {}, key: const Key('nav_icon_home')),
+        _fbIconButton(Icons.notifications_outlined, () {}, key: const Key('nav_icon_notifications')),
+        _fbIconButton(Icons.settings_outlined, () {}, key: const Key('nav_icon_settings')),
         SizedBox(width: FacebookSizes.spacing8),
 
         // 用户头像
@@ -115,26 +99,9 @@ class FacebookLayout extends StatelessWidget {
     );
   }
 
-  /// 构建图标按钮
-  Widget _buildIconButton(IconData icon, VoidCallback onPressed) {
-    return Container(
-      width: 40.w,
-      height: 40.w,
-      margin: EdgeInsets.symmetric(horizontal: 4.w),
-      decoration: BoxDecoration(
-        color: FacebookColors.primaryHover,
-        shape: BoxShape.circle,
-      ),
-      child: IconButton(
-        icon: Icon(
-          icon,
-          color: FacebookColors.textOnPrimary,
-          size: FacebookSizes.iconMedium,
-        ),
-        onPressed: onPressed,
-        padding: EdgeInsets.zero,
-      ),
-    );
+  /// 构建图标按钮 - Facebook风格（36px圆形，悬停高亮）
+  Widget _fbIconButton(IconData icon, VoidCallback onPressed, {Key? key}) {
+    return _HoverIconButton(icon: icon, onPressed: onPressed, buttonKey: key);
   }
 
   /// 构建主体布局
@@ -208,6 +175,145 @@ class FacebookLayout extends StatelessWidget {
     return Drawer(
       backgroundColor: FacebookColors.surface,
       child: const FacebookRightSidebar(),
+    );
+  }
+}
+
+/// 内部私有组件：带悬停高亮效果的圆形图标按钮
+class _HoverIconButton extends StatefulWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+  final Key? buttonKey;
+
+  const _HoverIconButton({
+    required this.icon,
+    required this.onPressed,
+    this.buttonKey,
+  });
+
+  @override
+  State<_HoverIconButton> createState() => _HoverIconButtonState();
+}
+
+class _HoverIconButtonState extends State<_HoverIconButton> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedContainer(
+        key: widget.buttonKey,
+        duration: FacebookSizes.animationFast,
+        width: 36.w,
+        height: 36.w,
+        margin: EdgeInsets.symmetric(horizontal: 4.w),
+        decoration: BoxDecoration(
+          color: _hovered ? FacebookColors.inputBackground : Colors.transparent,
+          shape: BoxShape.circle,
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(18.r),
+            onTap: widget.onPressed,
+            child: Center(
+              child: Icon(
+                widget.icon,
+                color: FacebookColors.textOnPrimary,
+                size: 20.w,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 顶部导航搜索框（带悬停与聚焦态的Facebook风格）
+class _NavSearchField extends StatefulWidget {
+  const _NavSearchField();
+
+  @override
+  State<_NavSearchField> createState() => _NavSearchFieldState();
+}
+
+class _NavSearchFieldState extends State<_NavSearchField> {
+  bool _hovered = false;
+  bool _focused = false;
+  final _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      if (mounted) setState(() => _focused = _focusNode.hasFocus);
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final borderColor = _focused
+        ? FacebookColors.primary
+        : (_hovered ? const Color(0xFFDADDE1) : FacebookColors.border);
+    final borderWidth = _focused ? 2.0 : 1.0;
+    final boxShadow = (_hovered || _focused)
+        ? [
+            BoxShadow(
+              color: FacebookColors.shadow,
+              blurRadius: FacebookSizes.shadowBlurRadius,
+              offset: Offset(0, FacebookSizes.shadowOffsetY),
+            ),
+          ]
+        : <BoxShadow>[];
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedContainer(
+        key: const Key('nav_search_container'),
+        duration: FacebookSizes.animationFast,
+        height: 36.h,
+        constraints: BoxConstraints(maxWidth: 240.w),
+        decoration: BoxDecoration(
+          color: FacebookColors.inputBackground,
+          borderRadius: BorderRadius.circular(FacebookSizes.radiusRound),
+          border: Border.all(color: borderColor, width: borderWidth),
+          boxShadow: boxShadow,
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: FacebookSizes.spacing12,
+          vertical: FacebookSizes.spacing4,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.search,
+              size: FacebookSizes.iconSmall,
+              color: FacebookColors.iconGray,
+            ),
+            SizedBox(width: FacebookSizes.spacing8),
+            Expanded(
+              child: TextField(
+                focusNode: _focusNode,
+                decoration: const InputDecoration(
+                  isDense: true,
+                  border: InputBorder.none,
+                  hintText: '搜索日记内容...',
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

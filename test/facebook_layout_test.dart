@@ -22,10 +22,10 @@ void main() {
     // 顶部导航栏
     expect(find.byType(AppBar), findsOneWidget);
 
-    // Facebook 图标与常用图标按钮
-    expect(find.byIcon(Icons.facebook), findsOneWidget);
-    expect(find.byIcon(Icons.notifications), findsOneWidget);
-    expect(find.byIcon(Icons.settings), findsOneWidget);
+    // Facebook 图标与常用图标按钮（使用outlined版本）
+    expect(find.byKey(const Key('appbar_fb_icon')), findsOneWidget);
+    expect(find.byKey(const Key('nav_icon_home')), findsOneWidget);
+    expect(find.byKey(const Key('nav_icon_notifications')), findsOneWidget);
+    expect(find.byKey(const Key('nav_icon_settings')), findsOneWidget);
   });
 }
-

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -21,13 +22,13 @@ void main() {
     // 等待ScreenUtilInit初始化完成
     await tester.pumpAndSettle();
 
-    // 验证应用名称显示
-    expect(find.text('欢迎使用 砚记 (Inkboard)'), findsOneWidget);
+    // 验证Facebook风格首页内容
+    expect(find.textContaining('今天你想记录什么'), findsOneWidget);
 
-    // 验证版本信息显示
-    expect(find.text('版本: 1.0.0'), findsOneWidget);
+    // 验证占位内容
+    expect(find.textContaining('还没有日记内容'), findsOneWidget);
 
-    // 验证Sprint 1任务完成情况显示
-    expect(find.textContaining('Sprint 1 任务完成情况'), findsOneWidget);
+    // 验证Facebook布局组件
+    expect(find.byType(AppBar), findsOneWidget);
   });
 }

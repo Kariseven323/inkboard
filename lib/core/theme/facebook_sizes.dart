@@ -79,17 +79,17 @@ class FacebookSizes {
   static double get pageHorizontalPadding => spacing16; // 页面水平内边距
   static double get pageVerticalPadding => spacing16;   // 页面垂直内边距
 
-  /// 最大宽度（响应式设计）
-  static double get maxContentWidth => 1200.w;   // 内容最大宽度
-  static double get sidebarWidth => 240.w;       // 侧边栏宽度
-  static double get mainContentWidth => 590.w;   // 主内容区宽度
-  static double get rightSidebarWidth => 280.w;  // 右侧栏宽度
+  /// 最大宽度（响应式设计：遵循Facebook桌面端固定像素）
+  static double get maxContentWidth => 1200.0;   // 内容最大宽度
+  static double get sidebarWidth => 240.0;       // 左侧栏宽度
+  static double get mainContentWidth => 590.0;   // 主内容区宽度
+  static double get rightSidebarWidth => 280.0;  // 右侧栏宽度
 
-  /// 断点（响应式）
-  static double get breakpointMobile => 480.w;   // 移动端断点
-  static double get breakpointTablet => 768.w;   // 平板断点
-  static double get breakpointDesktop => 1024.w; // 桌面端断点
-  static double get breakpointLarge => 1440.w;   // 大屏断点
+  /// 断点（响应式，使用逻辑像素，不参与缩放）
+  static double get breakpointMobile => 480.0;   // 移动端断点
+  static double get breakpointTablet => 768.0;   // 平板断点
+  static double get breakpointDesktop => 1024.0; // 桌面端断点
+  static double get breakpointLarge => 1440.0;   // 大屏断点
 
   /// 阴影偏移
   static double get shadowOffsetY => 1.h;        // 阴影Y偏移

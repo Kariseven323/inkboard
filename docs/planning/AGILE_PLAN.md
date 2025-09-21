@@ -28,7 +28,7 @@
 ```
 周次    Sprint    目标                           状态
 1-2     Sprint 1  项目基础设置 + UI框架搭建      🔄 进行中
-3-4     Sprint 2  Facebook风格首页完整实现       📋 计划中
+3-4     Sprint 2  Facebook风格首页完整实现       🔄 进行中
 5-6     Sprint 3  核心数据层开发                📋 计划中
 7-8     Sprint 4  日记CRUD功能集成到UI界面       📋 计划中
 9-10    Sprint 5  搜索和标签功能                📋 计划中
