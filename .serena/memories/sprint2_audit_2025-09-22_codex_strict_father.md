@@ -1,0 +1,15 @@
+Sprint 2 审计（严格父亲视角）要点：
+- 依据 docs/planning/AGILE_PLAN.md:83-95 与 9.4/9.5 质量标准进行对照。
+- 暂存区核心变更（git diff --cached --name-status）：
+  - 新增：home_page、facebook_post_composer、facebook_diary_card、交互/断点测试
+  - 修改：facebook_layout（顶栏、断点、悬停/聚焦搜索框）、left/right sidebars、main.dart、sizes
+- 对照结果：
+  - INK-034 顶部导航栏：满足（Logo、搜索框、右侧图标，44px；悬停/聚焦行为有测试覆盖）
+  - INK-035 左侧导航：满足（图标、悬停/Active 样式）
+  - INK-036 发布区：满足（“你在想什么？”输入区域 + 三按钮）
+  - INK-037 内容卡片：满足（8px圆角、1px边框、阴影、操作按钮）
+  - INK-038 右侧栏：基本满足样式，但内容偏离“联系人/推荐”，现为“标签/统计/提示/历史”——建议补全联系人模块
+  - INK-039 响应式：满足（断点 + 测试验证移动/桌面侧栏显隐）
+- 设计规范核查：色值/圆角/阴影/间距——一致；字体栈尚用 SF Pro Display，未显式包含 Helvetica——建议在 TextTheme 或 ThemeData 中加入 Helvetica fallback。
+- 评分（严格）：92/100，扣分项：右侧栏内容不符（-5），字体栈未对齐规范（-3）。
+- 建议：新增“联系人列表”组件与数据占位；TextTheme 增加 Helvetica fallback。
