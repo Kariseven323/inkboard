@@ -1,0 +1,10 @@
+targets:
+  $default:
+    builders:
+      injectable_generator:injectable_builder:
+        options:
+          auto_register: true
+          # 自动注册匹配模式的类名
+          class_name_pattern: "Service$|Repository$|Provider$|Controller$|UseCase$"
+          # 自动注册匹配模式的文件名
+          file_name_pattern: "_service$|_repository$|_provider$|_controller$|_usecase$"

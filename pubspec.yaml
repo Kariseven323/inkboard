@@ -35,8 +35,20 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
+  # 依赖注入
+  get_it: ^8.0.3
+  injectable: ^2.5.0
+
+  # 状态管理
+  flutter_riverpod: ^2.6.1
+
+  # UI相关
+  flutter_screenutil: ^5.9.3
+
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  integration_test:
     sdk: flutter
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -45,6 +57,10 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+
+  # 代码生成
+  build_runner: ^2.4.13
+  injectable_generator: ^2.6.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -1,30 +1,33 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:inkboard/main.dart';
+import 'package:inkboard/core/di/service_locator.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  setUpAll(() {
+    // 在测试前配置依赖注入
+    configureDependencies();
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  testWidgets('App启动测试', (WidgetTester tester) async {
+    // 构建应用并触发一帧
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: InkboardApp(),
+      ),
+    );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // 等待ScreenUtilInit初始化完成
+    await tester.pumpAndSettle();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // 验证应用名称显示
+    expect(find.text('欢迎使用 砚记 (Inkboard)'), findsOneWidget);
+
+    // 验证版本信息显示
+    expect(find.text('版本: 1.0.0'), findsOneWidget);
+
+    // 验证Sprint 1任务完成情况显示
+    expect(find.textContaining('Sprint 1 任务完成情况'), findsOneWidget);
   });
 }
