@@ -12,7 +12,7 @@ void main() {
     configureDependencies();
   });
 
-  Future<void> _pumpWithSize(WidgetTester tester, Size size) async {
+  Future<void> pumpWithSize(WidgetTester tester, Size size) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
@@ -29,7 +29,7 @@ void main() {
   }
 
   testWidgets('移动端：可打开左右抽屉分别显示侧栏', (WidgetTester tester) async {
-    await _pumpWithSize(tester, const Size(390, 844)); // iPhone 12 Pro 尺寸
+    await pumpWithSize(tester, const Size(390, 844)); // iPhone 12 Pro 尺寸
 
     final scaffoldState = tester.state(find.byType(Scaffold)) as ScaffoldState;
 

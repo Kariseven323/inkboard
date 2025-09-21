@@ -10,7 +10,7 @@ void main() {
     configureDependencies();
   });
 
-  Future<void> _pumpMobile(WidgetTester tester) async {
+  Future<void> pumpMobile(WidgetTester tester) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
@@ -27,7 +27,7 @@ void main() {
   }
 
   testWidgets('左侧栏：导航菜单与底部信息（移动端抽屉打开后可见）', (WidgetTester tester) async {
-    await _pumpMobile(tester);
+    await pumpMobile(tester);
 
     // 打开左侧抽屉
     final scaffoldState = tester.state(find.byType(Scaffold)) as ScaffoldState;
@@ -47,7 +47,7 @@ void main() {
   });
 
   testWidgets('右侧栏：常用标签/写作统计/写作提示/历史上的今天（移动端右侧抽屉）', (WidgetTester tester) async {
-    await _pumpMobile(tester);
+    await pumpMobile(tester);
 
     // 打开右侧抽屉
     final scaffoldState = tester.state(find.byType(Scaffold)) as ScaffoldState;

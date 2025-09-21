@@ -48,7 +48,6 @@ class _ThemeSmokeApp extends StatelessWidget {
                       const Chip(label: Text('Chip')),
                       Switch(value: true, onChanged: (_) {}),
                       Checkbox(value: true, onChanged: (_) {}),
-                      Radio<int>(value: 1, groupValue: 1, onChanged: (_) {}),
                     ],
                   );
                 }),
