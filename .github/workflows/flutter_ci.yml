@@ -37,10 +37,15 @@ jobs:
           THRESHOLD: ${{ env.COVERAGE_THRESHOLD }}
         run: |
           python3 - << 'PY'
-          import sys
+          import os, sys
           total_lines = 0
           hit_lines = 0
-          threshold = float('${THRESHOLD}')
+          # 从环境变量读取阈值，避免 here-doc 单引号导致的变量不展开
+          try:
+            threshold = float(os.environ.get('THRESHOLD', '90.0'))
+          except ValueError:
+            print(f"Invalid THRESHOLD env: {os.environ.get('THRESHOLD')}\nFailing.")
+            sys.exit(1)
           try:
             with open('coverage/lcov.info', 'r', encoding='utf-8') as f:
               for line in f:
