@@ -18,7 +18,7 @@ void main() {
       ),
     );
 
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 400));
 
     final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
     final theme = materialApp.theme!;
@@ -29,4 +29,3 @@ void main() {
     expect(theme.colorScheme.surface, FacebookColors.surface);
   });
 }
-

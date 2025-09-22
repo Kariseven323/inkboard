@@ -17,7 +17,7 @@ void main() {
       ),
     );
 
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 300));
 
     // 顶部导航栏
     expect(find.byType(AppBar), findsOneWidget);

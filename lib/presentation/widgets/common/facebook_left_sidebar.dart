@@ -57,11 +57,11 @@ class FacebookLeftSidebar extends StatelessWidget {
 
                 // 分割线
                 Divider(
-                  height: FacebookSizes.spacing24,
+                  height: 24.0,
                   thickness: FacebookSizes.dividerThickness,
                   color: FacebookColors.divider,
-                  indent: FacebookSizes.spacing16,
-                  endIndent: FacebookSizes.spacing16,
+                  indent: 12.0,
+                  endIndent: 12.0,
                 ),
 
                 _buildNavigationItem(
@@ -155,14 +155,12 @@ class FacebookLeftSidebar extends StatelessWidget {
   }) {
     return LayoutBuilder(builder: (context, constraints) {
       final compact = constraints.maxWidth < 160;
-      final horizontalPadding = compact ? 8.0 : FacebookSizes.spacing12;
-      final verticalPadding = compact ? 8.0 : FacebookSizes.spacing12;
+      // 使用常量像素，避免在固定240px侧栏内被ScreenUtil放大导致溢出
+      final horizontalPadding = compact ? 8.0 : 12.0;
+      final verticalPadding = compact ? 8.0 : 12.0;
 
       return Container(
-        margin: EdgeInsets.symmetric(
-          horizontal: FacebookSizes.spacing8,
-          vertical: FacebookSizes.spacing2,
-        ),
+        margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
         child: Material(
           color: isActive
               ? FacebookColors.primary.withValues(alpha: 0.1)
@@ -193,9 +191,9 @@ class FacebookLeftSidebar extends StatelessWidget {
                           color: isActive
                               ? FacebookColors.primary
                               : FacebookColors.iconGray,
-                          size: compact ? 18.0 : FacebookSizes.iconMedium,
+                          size: compact ? 18.0 : 20.0,
                         ),
-                        SizedBox(width: FacebookSizes.spacing12),
+                        const SizedBox(width: 12.0),
                         Expanded(
                           child: Text(
                             title,

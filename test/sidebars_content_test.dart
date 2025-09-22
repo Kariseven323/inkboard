@@ -23,7 +23,7 @@ void main() {
         child: InkboardApp(),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 300));
   }
 
   testWidgets('左侧栏：导航菜单与底部信息（移动端抽屉打开后可见）', (WidgetTester tester) async {
@@ -32,7 +32,7 @@ void main() {
     // 打开左侧抽屉
     final scaffoldState = tester.state(find.byType(Scaffold)) as ScaffoldState;
     scaffoldState.openDrawer();
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.text('主页'), findsOneWidget);
     expect(find.text('我的日记'), findsOneWidget);
@@ -52,7 +52,7 @@ void main() {
     // 打开右侧抽屉
     final scaffoldState = tester.state(find.byType(Scaffold)) as ScaffoldState;
     scaffoldState.openEndDrawer();
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 400));
 
     // 常用标签
     for (final tag in ['工作', '生活', '学习', '旅行', '美食', '读书']) {

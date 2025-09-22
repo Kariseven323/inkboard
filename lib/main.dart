@@ -7,6 +7,7 @@ import 'core/services/app_config_service.dart';
 import 'core/theme/facebook_theme.dart';
 import 'presentation/layouts/facebook_layout.dart';
 import 'presentation/pages/home_page.dart';
+import 'presentation/providers/theme_provider.dart';
 
 void main() {
   // 配置依赖注入
@@ -22,11 +23,13 @@ void main() {
   );
 }
 
-class InkboardApp extends StatelessWidget {
+class InkboardApp extends ConsumerWidget {
   const InkboardApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeNotifier = ref.watch(themeProvider.notifier);
+
     return ScreenUtilInit(
       designSize: const Size(390, 844), // iPhone 12 Pro 尺寸
       minTextAdapt: true,
@@ -36,7 +39,7 @@ class InkboardApp extends StatelessWidget {
           title: getIt<AppConfigService>().appName,
           theme: FacebookTheme.getLightTheme(),
           darkTheme: FacebookTheme.getDarkTheme(),
-          themeMode: ThemeMode.system,
+          themeMode: themeNotifier.toFlutterThemeMode(),
           home: const FacebookLayout(
             child: HomePage(),
           ),

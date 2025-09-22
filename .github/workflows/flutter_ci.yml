@@ -32,7 +32,12 @@ jobs:
       - name: Run tests with coverage
         run: flutter test --coverage
 
-      - name: Check coverage threshold
+      - name: Filter coverage (exclude generated/platform files)
+        run: |
+          python3 scripts/filter_lcov.py
+          echo "Filtered coverage at coverage/lcov.filtered.info"
+
+      - name: Check coverage threshold (filtered)
         env:
           THRESHOLD: ${{ env.COVERAGE_THRESHOLD }}
         run: |
@@ -40,6 +45,7 @@ jobs:
           import os, sys
           total_lines = 0
           hit_lines = 0
+          target = 'coverage/lcov.filtered.info'
           # 从环境变量读取阈值，避免 here-doc 单引号导致的变量不展开
           try:
             threshold = float(os.environ.get('THRESHOLD', '90.0'))
@@ -47,14 +53,14 @@ jobs:
             print(f"Invalid THRESHOLD env: {os.environ.get('THRESHOLD')}\nFailing.")
             sys.exit(1)
           try:
-            with open('coverage/lcov.info', 'r', encoding='utf-8') as f:
+            with open(target, 'r', encoding='utf-8') as f:
               for line in f:
                 if line.startswith('LF:'):
                   total_lines += int(line.strip().split(':')[1])
                 elif line.startswith('LH:'):
                   hit_lines += int(line.strip().split(':')[1])
           except FileNotFoundError:
-            print('coverage/lcov.info not found. Failing.')
+            print(f'{target} not found. Failing.')
             sys.exit(1)
           if total_lines == 0:
             print('No lines found in coverage; failing.')
@@ -66,11 +72,11 @@ jobs:
             sys.exit(1)
           PY
 
-      - name: Upload coverage artifact
+      - name: Upload coverage artifact (filtered)
         uses: actions/upload-artifact@v4
         with:
           name: coverage-lcov
-          path: coverage/lcov.info
+          path: coverage/lcov.filtered.info
 
       # 注意：integration_test 通常需要设备/模拟器，默认不在CI执行
       # 可在后续加入 matrix + emulator 配置再启用。

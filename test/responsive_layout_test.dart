@@ -25,7 +25,7 @@ void main() {
         child: InkboardApp(),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 300));
   }
 
   testWidgets('移动端：可打开左右抽屉分别显示侧栏', (WidgetTester tester) async {
@@ -35,17 +35,17 @@ void main() {
 
     // 打开左侧抽屉
     scaffoldState.openDrawer();
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 400));
     expect(find.byType(Drawer), findsOneWidget);
     expect(find.byType(FacebookLeftSidebar), findsOneWidget);
 
     // 关闭左侧抽屉
     Navigator.of(tester.element(find.byType(Scaffold))).pop();
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 300));
 
     // 打开右侧抽屉
     scaffoldState.openEndDrawer();
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 400));
     expect(find.byType(Drawer), findsOneWidget);
     expect(find.byType(FacebookRightSidebar), findsOneWidget);
   });

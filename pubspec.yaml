@@ -44,11 +44,12 @@ dependencies:
 
   # UI相关
   flutter_screenutil: ^5.9.3
+  shared_preferences: ^2.3.3
+  markdown_widget: ^2.3.2+8
 
   # 数据库
   drift: ^2.20.3
   drift_flutter: ^0.2.0
-  sqlcipher_flutter_libs: ^0.6.8
   path_provider: ^2.1.4
   path: ^1.9.0
   flutter_secure_storage: ^9.2.2
@@ -114,5 +115,5 @@ flutter:
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/to/font-from-package
+# For details regarding fonts from package dependencies,
+# see https://flutter.dev/to/font-from-package
