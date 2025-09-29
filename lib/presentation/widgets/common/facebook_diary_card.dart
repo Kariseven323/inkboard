@@ -12,10 +12,12 @@ class FacebookDiaryCard extends StatelessWidget {
   final List<String>? tags;
   final bool isFavorite;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final VoidCallback? onFavoriteTap;
   final VoidCallback? onEditTap;
   final VoidCallback? onDeleteTap;
   final VoidCallback? onShareTap;
+  final String? heroTag; // 用于Hero共享元素动画（可选）
 
   const FacebookDiaryCard({
     super.key,
@@ -25,10 +27,12 @@ class FacebookDiaryCard extends StatelessWidget {
     this.tags,
     this.isFavorite = false,
     this.onTap,
+    this.onLongPress,
     this.onFavoriteTap,
     this.onEditTap,
     this.onDeleteTap,
     this.onShareTap,
+    this.heroTag,
   });
 
   @override
@@ -47,6 +51,7 @@ class FacebookDiaryCard extends StatelessWidget {
         ),
         child: InkWell(
           onTap: onTap,
+          onLongPress: onLongPress,
           borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
           child: Padding(
             padding: FacebookSizes.paddingAll,
@@ -91,21 +96,25 @@ class FacebookDiaryCard extends StatelessWidget {
     return Row(
       children: [
         // 日记图标（替代用户头像）
-        Container(
-          width: FacebookSizes.avatarMedium,
-          height: FacebookSizes.avatarMedium,
-          decoration: BoxDecoration(
-            color: FacebookColors.primary.withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: FacebookColors.primary.withValues(alpha: 0.3),
-              width: 1,
+        Hero(
+          tag: heroTag != null ? '${heroTag}_avatar' : UniqueKey().toString(),
+          // 当未提供heroTag时仍提供唯一tag，避免Hero冲突
+          child: Container(
+            width: FacebookSizes.avatarMedium,
+            height: FacebookSizes.avatarMedium,
+            decoration: BoxDecoration(
+              color: FacebookColors.primary.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: FacebookColors.primary.withValues(alpha: 0.3),
+                width: 1,
+              ),
             ),
-          ),
-          child: Icon(
-            Icons.edit_note,
-            color: FacebookColors.primary,
-            size: FacebookSizes.iconMedium,
+            child: Icon(
+              Icons.edit_note,
+              color: FacebookColors.primary,
+              size: FacebookSizes.iconMedium,
+            ),
           ),
         ),
 
@@ -116,14 +125,28 @@ class FacebookDiaryCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style: FacebookTextStyles.bodyLarge.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: FacebookColors.textPrimary,
+              Hero(
+                tag: heroTag != null ? '${heroTag}_title' : UniqueKey().toString(),
+                flightShuttleBuilder: (context, animation, direction, fromContext, toContext) {
+                  // 使用透明Material包裹，避免文本样式在飞行中失真
+                  final Widget toHero = toContext.widget;
+                  return FadeTransition(
+                    opacity: animation.drive(Tween(begin: 0.6, end: 1.0)),
+                    child: toHero,
+                  );
+                },
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: Text(
+                    title,
+                    style: FacebookTextStyles.bodyLarge.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: FacebookColors.textPrimary,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
               SizedBox(height: FacebookSizes.spacing4),
               Text(

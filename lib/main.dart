@@ -8,6 +8,7 @@ import 'core/theme/facebook_theme.dart';
 import 'presentation/layouts/facebook_layout.dart';
 import 'presentation/pages/home_page.dart';
 import 'presentation/providers/theme_provider.dart';
+import 'presentation/providers/settings_provider.dart';
 
 void main() {
   // 配置依赖注入
@@ -35,11 +36,19 @@ class InkboardApp extends ConsumerWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
+        final textScale = ref.watch(textScaleProvider);
         return MaterialApp(
           title: getIt<AppConfigService>().appName,
           theme: FacebookTheme.getLightTheme(),
           darkTheme: FacebookTheme.getDarkTheme(),
           themeMode: themeNotifier.toFlutterThemeMode(),
+          builder: (context, child) {
+            final mq = MediaQuery.of(context);
+            return MediaQuery(
+              data: mq.copyWith(textScaler: TextScaler.linear(textScale)),
+              child: child ?? const SizedBox.shrink(),
+            );
+          },
           home: const FacebookLayout(
             child: HomePage(),
           ),

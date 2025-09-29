@@ -5,6 +5,7 @@ import '../../core/theme/facebook_sizes.dart';
 import '../widgets/common/facebook_left_sidebar.dart';
 import '../widgets/common/facebook_right_sidebar.dart';
 import '../pages/search_page.dart';
+import '../pages/settings_page.dart';
 
 /// Facebook风格的主布局
 /// 实现三栏布局：左侧导航栏 + 主内容区 + 右侧栏
@@ -82,7 +83,13 @@ class FacebookLayout extends StatelessWidget {
         // 右侧图标按钮（36px圆形，悬停#F0F2F5）
         _fbIconButton(Icons.home_outlined, () {}, key: const Key('nav_icon_home')),
         _fbIconButton(Icons.notifications_outlined, () {}, key: const Key('nav_icon_notifications')),
-        _fbIconButton(Icons.settings_outlined, () {}, key: const Key('nav_icon_settings')),
+        _fbIconButton(Icons.settings_outlined, () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const SettingsPage(),
+            ),
+          );
+        }, key: const Key('nav_icon_settings')),
         SizedBox(width: FacebookSizes.spacing8),
 
         // 用户头像

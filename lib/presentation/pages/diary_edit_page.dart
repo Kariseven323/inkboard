@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 
@@ -158,21 +159,26 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
           // 用户头像和提示
           Row(
             children: [
-              Container(
-                width: FacebookSizes.avatarMedium,
-                height: FacebookSizes.avatarMedium,
-                decoration: BoxDecoration(
-                  color: FacebookColors.primary.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: FacebookColors.primary.withValues(alpha: 0.3),
-                    width: 1,
+              Hero(
+                tag: _isEditMode && widget.diaryEntry?.id != null
+                    ? 'diary_${widget.diaryEntry!.id}_avatar'
+                    : UniqueKey().toString(),
+                child: Container(
+                  width: FacebookSizes.avatarMedium,
+                  height: FacebookSizes.avatarMedium,
+                  decoration: BoxDecoration(
+                    color: FacebookColors.primary.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: FacebookColors.primary.withValues(alpha: 0.3),
+                      width: 1,
+                    ),
                   ),
-                ),
-                child: Icon(
-                  Icons.edit_note,
-                  color: FacebookColors.primary,
-                  size: FacebookSizes.iconMedium,
+                  child: Icon(
+                    Icons.edit_note,
+                    color: FacebookColors.primary,
+                    size: FacebookSizes.iconMedium,
+                  ),
                 ),
               ),
               SizedBox(width: FacebookSizes.spacing12),
@@ -190,25 +196,33 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
           SizedBox(height: FacebookSizes.spacing16),
 
           // 标题输入框
-          TextFormField(
-            controller: _titleController,
-            style: FacebookTextStyles.bodyLarge.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-            decoration: InputDecoration(
-              hintText: '给你的日记起个标题...',
-              hintStyle: FacebookTextStyles.bodyLarge.copyWith(
-                color: FacebookColors.textSecondary,
+          Hero(
+            tag: _isEditMode && widget.diaryEntry?.id != null
+                ? 'diary_${widget.diaryEntry!.id}_title'
+                : UniqueKey().toString(),
+            child: Material(
+              type: MaterialType.transparency,
+              child: TextFormField(
+                controller: _titleController,
+                style: FacebookTextStyles.bodyLarge.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+                decoration: InputDecoration(
+                  hintText: '给你的日记起个标题...',
+                  hintStyle: FacebookTextStyles.bodyLarge.copyWith(
+                    color: FacebookColors.textSecondary,
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                validator: (value) {
+                  if (value?.trim().isEmpty ?? true) {
+                    return '请输入标题';
+                  }
+                  return null;
+                },
               ),
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.zero,
             ),
-            validator: (value) {
-              if (value?.trim().isEmpty ?? true) {
-                return '请输入标题';
-              }
-              return null;
-            },
           ),
         ],
       ),
@@ -609,6 +623,7 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
   /// 处理返回按钮
   void _handleBackPressed() {
     if (_titleController.text.isNotEmpty || _contentController.text.isNotEmpty) {
+      HapticFeedback.selectionClick();
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -621,6 +636,7 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
             ),
             TextButton(
               onPressed: () {
+                HapticFeedback.lightImpact();
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
@@ -633,6 +649,7 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
         ),
       );
     } else {
+      HapticFeedback.selectionClick();
       Navigator.of(context).pop();
     }
   }
@@ -644,6 +661,7 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
     }
 
     setState(() => _isLoading = true);
+    HapticFeedback.mediumImpact();
 
     try {
       // 解析标签
@@ -676,6 +694,7 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
                 backgroundColor: FacebookColors.success,
               ),
             );
+            HapticFeedback.selectionClick();
             Navigator.of(context).pop(true); // 返回true表示保存成功
           }
         } else {
@@ -686,6 +705,7 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
                 backgroundColor: FacebookColors.error,
               ),
             );
+            HapticFeedback.lightImpact();
           }
         }
       } else {
@@ -710,6 +730,7 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
                 backgroundColor: FacebookColors.success,
               ),
             );
+            HapticFeedback.selectionClick();
             Navigator.of(context).pop(true); // 返回true表示保存成功
           }
         } else {
@@ -720,6 +741,7 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
                 backgroundColor: FacebookColors.error,
               ),
             );
+            HapticFeedback.lightImpact();
           }
         }
       }

@@ -141,6 +141,20 @@ flutter analyze
 dart format lib/ test/
 ```
 
+### 发布准备（图标与启动页）
+```bash
+# 准备资源：
+# - 将应用图标放置到 assets/icon/icon.png
+# - 将启动页图片放置到 assets/splash.png
+
+# 生成应用图标
+flutter pub get
+dart run flutter_launcher_icons
+
+# 生成原生启动页
+dart run flutter_native_splash:create
+```
+
 ## 质量保证
 
 ### 测试覆盖目标

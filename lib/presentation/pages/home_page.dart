@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/common/facebook_post_composer.dart';
 import '../widgets/common/facebook_diary_card.dart';
@@ -78,8 +80,21 @@ class HomePage extends ConsumerWidget {
         if (entries.isEmpty) {
           return _buildEmptyState();
         }
+        // 支持滑动删除与长按菜单；并增加轻量的入场动画
         return Column(
-          children: entries.map((entry) => _buildDiaryCard(context, entry)).toList(),
+          children: entries.asMap().entries.map((e) {
+            final index = e.key;
+            final entry = e.value;
+            final heroTag = 'diary_${entry.id}';
+            return _buildDismissible(
+              context,
+              entry,
+              child: _animatedWrapper(
+                index: index,
+                child: _buildDiaryCard(context, entry, heroTag: heroTag),
+              ),
+            );
+          }).toList(),
         );
       },
       loading: () => _buildLoadingState(),
@@ -88,7 +103,7 @@ class HomePage extends ConsumerWidget {
   }
 
   /// 构建日记卡片
-  Widget _buildDiaryCard(BuildContext context, DiaryEntry entry) {
+  Widget _buildDiaryCard(BuildContext context, DiaryEntry entry, {String? heroTag}) {
     return FacebookDiaryCard(
       title: entry.title,
       content: entry.content,
@@ -96,26 +111,32 @@ class HomePage extends ConsumerWidget {
       tags: entry.tags.map((tag) => tag.name).toList(),
       isFavorite: entry.isFavorite,
       onTap: () {
-        // TODO: 打开日记详情页面
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('日记详情功能开发中...'),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        HapticFeedback.selectionClick();
+        // 打开编辑页面（复用编辑页作为详情/编辑）
+        _openDiaryEditPage(context, entry);
       },
+      onLongPress: () => _showEntryActionSheet(context, entry),
       onFavoriteTap: () {
+        HapticFeedback.selectionClick();
         _toggleFavorite(context, entry);
       },
       onEditTap: () {
+        HapticFeedback.selectionClick();
         // 打开编辑页面
         _openDiaryEditPage(context, entry);
       },
       onDeleteTap: () {
+        HapticFeedback.mediumImpact();
         // 显示删除确认对话框
-        _showDeleteConfirmDialog(context, entry);
+        _showDeleteConfirmDialog(context, entry).then((ok) async {
+          if (ok && context.mounted) {
+            HapticFeedback.heavyImpact();
+            await _deleteDiary(context, entry);
+          }
+        });
       },
       onShareTap: () {
+        HapticFeedback.selectionClick();
         // TODO: 分享日记
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -124,6 +145,7 @@ class HomePage extends ConsumerWidget {
           ),
         );
       },
+      heroTag: heroTag,
     );
   }
 
@@ -259,7 +281,7 @@ class HomePage extends ConsumerWidget {
   /// 打开日记编辑页面
   Future<void> _openDiaryEditPage(BuildContext context, [DiaryEntry? diaryEntry]) async {
     final result = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => DiaryEditPage(diaryEntry: diaryEntry),
       ),
     );
@@ -271,7 +293,7 @@ class HomePage extends ConsumerWidget {
   }
 
   /// 显示删除确认对话框
-  Future<void> _showDeleteConfirmDialog(BuildContext context, DiaryEntry entry) async {
+  Future<bool> _showDeleteConfirmDialog(BuildContext context, DiaryEntry entry) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -373,11 +395,104 @@ class HomePage extends ConsumerWidget {
       ),
     );
 
-    if (confirmed == true) {
-      if (context.mounted) {
-        await _deleteDiary(context, entry);
-      }
-    }
+    return confirmed == true;
+  }
+
+  /// 包装Dismissible实现滑动删除
+  Widget _buildDismissible(BuildContext context, DiaryEntry entry, {required Widget child}) {
+    return Dismissible(
+      key: ValueKey('entry_${entry.id}'),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: EdgeInsets.symmetric(horizontal: FacebookSizes.spacing16),
+        decoration: BoxDecoration(
+          color: FacebookColors.error.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
+        ),
+        child: Icon(Icons.delete_outline, color: FacebookColors.error),
+      ),
+      confirmDismiss: (_) async {
+        HapticFeedback.selectionClick();
+        final ok = await _showDeleteConfirmDialog(context, entry);
+        if (ok) {
+          HapticFeedback.heavyImpact();
+          await _deleteDiary(context, entry);
+        }
+        return ok; // 如果确认，允许dismiss
+      },
+      child: child,
+    );
+  }
+
+  /// 简单入场动效封装
+  Widget _animatedWrapper({required int index, required Widget child}) {
+    final duration = Duration(milliseconds: 250 + (index * 30));
+    return TweenAnimationBuilder<double>(
+      duration: duration,
+      tween: Tween(begin: 0, end: 1),
+      curve: Curves.easeOut,
+      builder: (context, value, _) => Opacity(
+        opacity: value,
+        child: Transform.translate(
+          offset: Offset(0, (1 - value) * 12),
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  /// 长按弹出操作菜单
+  Future<void> _showEntryActionSheet(BuildContext context, DiaryEntry entry) async {
+    HapticFeedback.lightImpact();
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(FacebookSizes.radiusLarge)),
+      ),
+      builder: (_) {
+        return SafeArea(
+          child: Padding(
+            padding: FacebookSizes.paddingAll,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.edit_outlined),
+                  title: const Text('编辑日记'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _openDiaryEditPage(context, entry);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(entry.isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: entry.isFavorite ? FacebookColors.error : null),
+                  title: Text(entry.isFavorite ? '取消收藏' : '收藏'),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    await _toggleFavorite(context, entry);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.delete_outline, color: FacebookColors.error),
+                  title: const Text('删除日记'),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    final ok = await _showDeleteConfirmDialog(context, entry);
+                    if (ok && context.mounted) {
+                      HapticFeedback.heavyImpact();
+                      await _deleteDiary(context, entry);
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   /// 删除日记

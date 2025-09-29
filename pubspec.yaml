@@ -75,6 +75,8 @@ dev_dependencies:
   build_runner: ^2.4.13
   injectable_generator: ^2.6.2
   drift_dev: ^2.20.1
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -117,3 +119,29 @@ flutter:
   #
 # For details regarding fonts from package dependencies,
 # see https://flutter.dev/to/font-from-package
+
+# 应用图标与启动页配置（占位，需准备资源文件后执行命令）
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/icon.png" # 请放置应用图标到此路径
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/icon/icon.png"
+    background_color: "#1877F2"
+    theme_color: "#1877F2"
+  windows:
+    generate: true
+    image_path: "assets/icon/icon.png"
+  macos:
+    generate: true
+    image_path: "assets/icon/icon.png"
+
+flutter_native_splash:
+  color: "#1877F2"
+  color_dark: "#0E1F4D"
+  image: "assets/splash.png" # 请放置启动页图片到此路径
+  android_12:
+    color: "#1877F2"
+    image: "assets/splash.png"
