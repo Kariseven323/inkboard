@@ -105,13 +105,7 @@ class HomePage extends ConsumerWidget {
         );
       },
       onFavoriteTap: () {
-        // TODO: 切换收藏状态
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('收藏功能开发中...'),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        _toggleFavorite(context, entry);
       },
       onEditTap: () {
         // 打开编辑页面
@@ -455,6 +449,90 @@ class HomePage extends ConsumerWidget {
                 SizedBox(width: FacebookSizes.spacing8),
                 Expanded(
                   child: Text('删除失败：$e'),
+                ),
+              ],
+            ),
+            backgroundColor: FacebookColors.error,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(FacebookSizes.radiusMedium),
+            ),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  /// 切换收藏状态
+  Future<void> _toggleFavorite(BuildContext context, DiaryEntry entry) async {
+    try {
+      final useCase = getIt<UpdateDiaryEntryUseCase>();
+      final result = await useCase.toggleFavorite(entry.id!);
+
+      if (result.isSuccess) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(
+                    entry.isFavorite ? Icons.favorite_border : Icons.favorite,
+                    color: Colors.white,
+                    size: FacebookSizes.iconSmall,
+                  ),
+                  SizedBox(width: FacebookSizes.spacing8),
+                  Text(entry.isFavorite ? '已取消收藏' : '已添加到收藏'),
+                ],
+              ),
+              backgroundColor: FacebookColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(FacebookSizes.radiusMedium),
+              ),
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 1),
+            ),
+          );
+        }
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    color: Colors.white,
+                    size: FacebookSizes.iconSmall,
+                  ),
+                  SizedBox(width: FacebookSizes.spacing8),
+                  Expanded(
+                    child: Text(result.error ?? '收藏操作失败'),
+                  ),
+                ],
+              ),
+              backgroundColor: FacebookColors.error,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(FacebookSizes.radiusMedium),
+              ),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  color: Colors.white,
+                  size: FacebookSizes.iconSmall,
+                ),
+                SizedBox(width: FacebookSizes.spacing8),
+                Expanded(
+                  child: Text('收藏操作失败：$e'),
                 ),
               ],
             ),

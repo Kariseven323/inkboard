@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/facebook_colors.dart';
 import '../../../core/theme/facebook_sizes.dart';
 import '../../../core/theme/facebook_text_styles.dart';
+import '../../pages/tag_management_page.dart';
+import '../../pages/favorites_page.dart';
+import '../../pages/search_page.dart';
+import '../../pages/export_page.dart';
 
 /// Facebook风格的左侧导航栏
 class FacebookLeftSidebar extends StatelessWidget {
@@ -37,12 +41,24 @@ class FacebookLeftSidebar extends StatelessWidget {
                 _buildNavigationItem(
                   icon: Icons.local_offer_outlined,
                   title: '标签管理',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const TagManagementPage(),
+                      ),
+                    );
+                  },
                 ),
                 _buildNavigationItem(
                   icon: Icons.favorite_border_outlined,
                   title: '收藏夹',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const FavoritesPage(),
+                      ),
+                    );
+                  },
                 ),
                 _buildNavigationItem(
                   icon: Icons.analytics_outlined,
@@ -52,7 +68,13 @@ class FacebookLeftSidebar extends StatelessWidget {
                 _buildNavigationItem(
                   icon: Icons.search_outlined,
                   title: '高级搜索',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const SearchPage(),
+                      ),
+                    );
+                  },
                 ),
 
                 // 分割线
@@ -67,7 +89,13 @@ class FacebookLeftSidebar extends StatelessWidget {
                 _buildNavigationItem(
                   icon: Icons.file_download_outlined,
                   title: '导出数据',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const ExportPage(),
+                      ),
+                    );
+                  },
                 ),
                 _buildNavigationItem(
                   icon: Icons.settings_outlined,

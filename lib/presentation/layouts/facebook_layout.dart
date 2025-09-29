@@ -4,6 +4,7 @@ import '../../core/theme/facebook_colors.dart';
 import '../../core/theme/facebook_sizes.dart';
 import '../widgets/common/facebook_left_sidebar.dart';
 import '../widgets/common/facebook_right_sidebar.dart';
+import '../pages/search_page.dart';
 
 /// Facebook风格的主布局
 /// 实现三栏布局：左侧导航栏 + 主内容区 + 右侧栏
@@ -309,6 +310,16 @@ class _NavSearchFieldState extends State<_NavSearchField> {
                   border: InputBorder.none,
                   hintText: '搜索日记内容...',
                 ),
+                textInputAction: TextInputAction.search,
+                onSubmitted: (value) {
+                  final q = value.trim();
+                  if (q.isEmpty) return;
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => SearchPage(initialQuery: q),
+                    ),
+                  );
+                },
               ),
             ),
           ],
