@@ -6,6 +6,11 @@ import '../../pages/tag_management_page.dart';
 import '../../pages/favorites_page.dart';
 import '../../pages/export_page.dart';
 import '../../pages/settings_page.dart';
+import '../../../core/di/service_locator.dart';
+import '../../../domain/repositories/user_profile_repository.dart';
+import '../../../domain/entities/user_profile.dart';
+import '../../pages/profile_edit_page.dart';
+import '../../pages/recycle_bin_page.dart';
 
 /// Facebook风格的左侧导航栏
 class FacebookLeftSidebar extends StatelessWidget {
@@ -78,6 +83,15 @@ class FacebookLeftSidebar extends StatelessWidget {
                   },
                 ),
                 _buildNavigationItem(
+                  icon: Icons.delete_outline,
+                  title: '回收站',
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const RecycleBinPage()),
+                    );
+                  },
+                ),
+                _buildNavigationItem(
                   icon: Icons.settings_outlined,
                   title: '设置',
                   onTap: () {
@@ -102,67 +116,132 @@ class FacebookLeftSidebar extends StatelessWidget {
 
   /// 构建用户资料信息
   Widget _buildUserProfile(BuildContext context) {
+    UserProfileRepository? repo;
+    try {
+      repo = getIt<UserProfileRepository>();
+    } catch (_) {
+      repo = null;
+    }
     return InkWell(
       onTap: () {
-        // Sprint1：先跳转到设置页中的外观/通用，后续Sprint2替换为“编辑资料”页面
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const SettingsPage()),
+          MaterialPageRoute(builder: (_) => const ProfileEditPage()),
         );
       },
       borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
       child: Container(
         padding: const EdgeInsets.all(12),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final avatar = const CircleAvatar(
+        child: repo == null
+            ? _buildStaticUserProfile()
+            : FutureBuilder<UserProfile?>(
+                future: repo.getProfile(),
+                builder: (context, snapshot) {
+                  final p = snapshot.data;
+            final avatar = CircleAvatar(
               radius: 20.0,
               backgroundColor: FacebookColors.primary,
-              child: Icon(
-                Icons.person,
-                color: FacebookColors.textOnPrimary,
-                size: 20.0,
-              ),
+              backgroundImage: p?.avatar != null ? MemoryImage(p!.avatar!) : null,
+              child: p?.avatar == null
+                  ? const Icon(
+                      Icons.person,
+                      color: FacebookColors.textOnPrimary,
+                      size: 20.0,
+                    )
+                  : null,
             );
 
-          final texts = Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '用户名',
-                style: FacebookTextStyles.username,
-                overflow: TextOverflow.ellipsis,
-              ),
-              Text(
-                '编辑资料',
-                style: FacebookTextStyles.caption.copyWith(
-                  color: FacebookColors.primary,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          );
-
-          if (constraints.maxWidth < 160) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+            final texts = Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(child: avatar),
-                const SizedBox(height: 8),
-                texts,
+                Text(
+                  (p?.nickname?.isNotEmpty ?? false) ? p!.nickname! : '用户名',
+                  style: FacebookTextStyles.username,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  '编辑资料',
+                  style: FacebookTextStyles.caption.copyWith(
+                    color: FacebookColors.primary,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
             );
-          }
 
-          return Row(
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth < 160) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Center(child: avatar),
+                      const SizedBox(height: 8),
+                      texts,
+                    ],
+                  );
+                }
+                return Row(
+                  children: [
+                    avatar,
+                    const SizedBox(width: 12),
+                    Expanded(child: texts),
+                  ],
+                );
+              },
+            );
+                },
+              ),
+      ),
+    );
+  }
+
+  Widget _buildStaticUserProfile() {
+    final avatar = const CircleAvatar(
+      radius: 20.0,
+      backgroundColor: FacebookColors.primary,
+      child: Icon(
+        Icons.person,
+        color: FacebookColors.textOnPrimary,
+        size: 20.0,
+      ),
+    );
+    final texts = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '用户名',
+          style: FacebookTextStyles.username,
+          overflow: TextOverflow.ellipsis,
+        ),
+        Text(
+          '编辑资料',
+          style: FacebookTextStyles.caption.copyWith(
+            color: FacebookColors.primary,
+          ),
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 160) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              avatar,
-              const SizedBox(width: 12),
-              Expanded(child: texts),
+              Center(child: avatar),
+              const SizedBox(height: 8),
+              texts,
             ],
           );
-        },
-      ),
-    ),
+        }
+        return Row(
+          children: [
+            avatar,
+            const SizedBox(width: 12),
+            Expanded(child: texts),
+          ],
+        );
+      },
     );
   }
 

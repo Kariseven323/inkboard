@@ -15,10 +15,10 @@ class DiaryEntryRepositoryImpl implements DiaryEntryRepository {
 
   @override
   Stream<List<DiaryEntry>> getAllDiaryEntries() {
-    return (_database.select(_database.diaryEntries)
-          ..orderBy([(entry) => OrderingTerm.desc(entry.createdAt)]))
-        .watch()
-        .asyncMap(_mapToEntitiesWithTags);
+    final q = _database.select(_database.diaryEntries)
+      ..where((e) => e.deletedAt.isNull())
+      ..orderBy([(entry) => OrderingTerm.desc(entry.createdAt)]);
+    return q.watch().asyncMap(_mapToEntitiesWithTags);
   }
 
   @override
@@ -27,7 +27,7 @@ class DiaryEntryRepositoryImpl implements DiaryEntryRepository {
       ..where((entry) => entry.id.equals(id));
 
     final result = await query.getSingleOrNull();
-    if (result == null) return null;
+    if (result == null || result.deletedAt != null) return null;
 
     final tags = await _getTagsForEntry(id);
     return _mapDataToEntity(result, tags);
@@ -49,6 +49,7 @@ class DiaryEntryRepositoryImpl implements DiaryEntryRepository {
               moodScore: Value(entry.moodScore),
               weather: Value(entry.weather),
               location: Value(entry.location),
+              isDraft: Value(entry.isDraft),
             ),
           );
 
@@ -77,6 +78,7 @@ class DiaryEntryRepositoryImpl implements DiaryEntryRepository {
               moodScore: Value(entry.moodScore),
               weather: Value(entry.weather),
               location: Value(entry.location),
+              isDraft: Value(entry.isDraft),
             ),
           );
 
@@ -111,28 +113,24 @@ class DiaryEntryRepositoryImpl implements DiaryEntryRepository {
 
   @override
   Stream<List<DiaryEntry>> getFavoriteDiaryEntries() {
-    return (_database.select(_database.diaryEntries)
-          ..where((entry) => entry.isFavorite.equals(true))
-          ..orderBy([(entry) => OrderingTerm.desc(entry.createdAt)]))
-        .watch()
-        .asyncMap(_mapToEntitiesWithTags);
+    final q = _database.select(_database.diaryEntries)
+      ..where((entry) => entry.isFavorite.equals(true) & entry.deletedAt.isNull())
+      ..orderBy([(entry) => OrderingTerm.desc(entry.createdAt)]);
+    return q.watch().asyncMap(_mapToEntitiesWithTags);
   }
 
   @override
   Stream<List<DiaryEntry>> getDiaryEntriesByTags(List<int> tagIds) {
     if (tagIds.isEmpty) return Stream.value([]);
 
-    final query =
-        _database.select(_database.diaryEntries).join([
-            innerJoin(
-              _database.diaryTags,
-              _database.diaryTags.diaryEntryId.equalsExp(
-                _database.diaryEntries.id,
-              ),
-            ),
-          ])
-          ..where(_database.diaryTags.tagId.isIn(tagIds))
-          ..orderBy([OrderingTerm.desc(_database.diaryEntries.createdAt)]);
+    final query = _database.select(_database.diaryEntries).join([
+      innerJoin(
+        _database.diaryTags,
+        _database.diaryTags.diaryEntryId.equalsExp(_database.diaryEntries.id),
+      ),
+    ])
+      ..where(_database.diaryTags.tagId.isIn(tagIds) & _database.diaryEntries.deletedAt.isNull())
+      ..orderBy([OrderingTerm.desc(_database.diaryEntries.createdAt)]);
 
     return query.watch().asyncMap((rows) async {
       final entries = rows
@@ -154,13 +152,10 @@ class DiaryEntryRepositoryImpl implements DiaryEntryRepository {
     DateTime startDate,
     DateTime endDate,
   ) {
-    return (_database.select(_database.diaryEntries)
-          ..where(
-            (entry) => entry.createdAt.isBetweenValues(startDate, endDate),
-          )
-          ..orderBy([(entry) => OrderingTerm.desc(entry.createdAt)]))
-        .watch()
-        .asyncMap(_mapToEntitiesWithTags);
+    final q = _database.select(_database.diaryEntries)
+      ..where((entry) => entry.createdAt.isBetweenValues(startDate, endDate) & entry.deletedAt.isNull())
+      ..orderBy([(entry) => OrderingTerm.desc(entry.createdAt)]);
+    return q.watch().asyncMap(_mapToEntitiesWithTags);
   }
 
   @override
@@ -183,22 +178,19 @@ class DiaryEntryRepositoryImpl implements DiaryEntryRepository {
 
   @override
   Future<Map<String, int>> getDiaryStatistics() async {
-    final totalCount = await _database
-        .select(_database.diaryEntries)
-        .get()
-        .then((rows) => rows.length);
-    final favoriteCount =
-        await (_database.select(_database.diaryEntries)
-              ..where((entry) => entry.isFavorite.equals(true)))
+    final totalCount = await (_database.select(_database.diaryEntries)
+              ..where((e) => e.deletedAt.isNull()))
+            .get()
+            .then((rows) => rows.length);
+    final favoriteCount = await (_database.select(_database.diaryEntries)
+              ..where((entry) => entry.isFavorite.equals(true) & entry.deletedAt.isNull()))
             .get()
             .then((rows) => rows.length);
 
     final thisMonth = DateTime.now();
     final firstDayOfMonth = DateTime(thisMonth.year, thisMonth.month, 1);
-    final monthlyCount =
-        await (_database.select(_database.diaryEntries)..where(
-              (entry) => entry.createdAt.isBiggerOrEqualValue(firstDayOfMonth),
-            ))
+    final monthlyCount = await (_database.select(_database.diaryEntries)
+              ..where((entry) => entry.createdAt.isBiggerOrEqualValue(firstDayOfMonth) & entry.deletedAt.isNull()))
             .get()
             .then((rows) => rows.length);
 
@@ -276,6 +268,59 @@ class DiaryEntryRepositoryImpl implements DiaryEntryRepository {
     });
   }
 
+  // ===== 回收站实现 =====
+  @override
+  Future<bool> softDeleteDiaryEntry(int id) async {
+    final count = await (_database.update(_database.diaryEntries)
+          ..where((e) => e.id.equals(id)))
+        .write(DiaryEntriesCompanion(deletedAt: Value(DateTime.now())));
+    return count > 0;
+  }
+
+  @override
+  Future<bool> softDeleteDiaryEntries(List<int> ids) async {
+    if (ids.isEmpty) return false;
+    final count = await (_database.update(_database.diaryEntries)
+          ..where((e) => e.id.isIn(ids)))
+        .write(DiaryEntriesCompanion(deletedAt: Value(DateTime.now())));
+    return count > 0;
+  }
+
+  @override
+  Stream<List<DiaryEntry>> getDeletedDiaryEntries() {
+    final q = _database.select(_database.diaryEntries)
+      ..where((e) => e.deletedAt.isNotNull())
+      ..orderBy([(e) => OrderingTerm.desc(e.deletedAt)]);
+    return q.watch().asyncMap(_mapToEntitiesWithTags);
+  }
+
+  @override
+  Future<bool> restoreDiaryEntry(int id) async {
+    final count = await (_database.update(_database.diaryEntries)
+          ..where((e) => e.id.equals(id)))
+        .write(const DiaryEntriesCompanion(deletedAt: Value(null)));
+    return count > 0;
+  }
+
+  @override
+  Future<bool> restoreDiaryEntries(List<int> ids) async {
+    if (ids.isEmpty) return false;
+    final count = await (_database.update(_database.diaryEntries)
+          ..where((e) => e.id.isIn(ids)))
+        .write(const DiaryEntriesCompanion(deletedAt: Value(null)));
+    return count > 0;
+  }
+
+  @override
+  Future<bool> purgeDiaryEntry(int id) async {
+    return deleteDiaryEntry(id);
+  }
+
+  @override
+  Future<bool> purgeDiaryEntries(List<int> ids) async {
+    return deleteDiaryEntries(ids);
+  }
+
   /// 获取指定日记条目的所有标签
   Future<List<Tag>> _getTagsForEntry(int entryId) async {
     final query = _database.select(_database.tags).join([
@@ -344,6 +389,7 @@ class DiaryEntryRepositoryImpl implements DiaryEntryRepository {
       weather: data.weather,
       location: data.location,
       tags: tags,
+      isDraft: data.isDraft,
     );
   }
 

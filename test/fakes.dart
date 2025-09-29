@@ -44,6 +44,44 @@ class InMemoryDiaryEntryRepository implements DiaryEntryRepository {
     return _entries.length < before;
   }
 
+  // 软删除：在内存实现中等同于硬删除（测试目的）
+  @override
+  Future<bool> softDeleteDiaryEntry(int id) async {
+    return deleteDiaryEntry(id);
+  }
+
+  @override
+  Future<bool> softDeleteDiaryEntries(List<int> ids) async {
+    return deleteDiaryEntries(ids);
+  }
+
+  @override
+  Stream<List<DiaryEntry>> getDeletedDiaryEntries() async* {
+    // 简化：内存实现不保留回收站数据
+    yield const <DiaryEntry>[];
+  }
+
+  @override
+  Future<bool> restoreDiaryEntry(int id) async {
+    // 简化：无状态
+    return true;
+  }
+
+  @override
+  Future<bool> restoreDiaryEntries(List<int> ids) async {
+    return true;
+  }
+
+  @override
+  Future<bool> purgeDiaryEntry(int id) async {
+    return true;
+  }
+
+  @override
+  Future<bool> purgeDiaryEntries(List<int> ids) async {
+    return true;
+  }
+
   @override
   Future<DiaryEntry?> getDiaryEntryById(int id) async {
     return _entries.where((e) => e.id == id).cast<DiaryEntry?>().firstOrNull;

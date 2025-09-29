@@ -17,15 +17,18 @@ import 'package:injectable/injectable.dart' as _i526;
 import '../../data/database/app_database.dart' as _i160;
 import '../../data/repositories/diary_entry_repository_impl.dart' as _i21;
 import '../../data/repositories/tag_repository_impl.dart' as _i165;
+import '../../data/repositories/user_profile_repository_impl.dart' as _i365;
 import '../../data/services/encryption_service_impl.dart' as _i608;
 import '../../data/services/search_service_impl.dart' as _i195;
 import '../../domain/repositories/diary_entry_repository.dart' as _i725;
 import '../../domain/repositories/tag_repository.dart' as _i627;
+import '../../domain/repositories/user_profile_repository.dart' as _i587;
 import '../../domain/services/encryption_service.dart' as _i13;
 import '../../domain/services/search_service.dart' as _i396;
 import '../../domain/usecases/create_diary_entry_usecase.dart' as _i828;
 import '../../domain/usecases/get_diary_entries_usecase.dart' as _i817;
 import '../../domain/usecases/search_diary_usecase.dart' as _i423;
+import '../../domain/usecases/soft_delete_diary_entry_usecase.dart' as _i842;
 import '../../domain/usecases/tag_management_usecase.dart' as _i575;
 import '../../domain/usecases/update_delete_diary_entry_usecase.dart' as _i378;
 import '../services/app_config_service.dart' as _i639;
@@ -59,6 +62,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i500.QueryExecutor>(
       () => diModules.appQueryExecutor(gh<_i307.DatabaseKeyService>()),
+    );
+    gh.lazySingleton<_i587.UserProfileRepository>(
+      () => _i365.UserProfileRepositoryImpl(gh<_i160.AppDatabase>()),
     );
     gh.lazySingleton<_i627.TagRepository>(
       () => _i165.TagRepositoryImpl(gh<_i160.AppDatabase>()),
@@ -95,6 +101,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i725.DiaryEntryRepository>(),
         gh<_i627.TagRepository>(),
       ),
+    );
+    gh.factory<_i842.SoftDeleteDiaryEntryUseCase>(
+      () => _i842.SoftDeleteDiaryEntryUseCase(gh<_i725.DiaryEntryRepository>()),
     );
     gh.factory<_i423.SearchDiaryUseCase>(
       () => _i423.SearchDiaryUseCase(gh<_i396.SearchService>()),

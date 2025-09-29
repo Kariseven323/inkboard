@@ -29,4 +29,10 @@ class DiaryEntries extends Table {
 
   /// 位置信息
   TextColumn get location => text().nullable()();
+
+  /// 是否为草稿
+  BoolColumn get isDraft => boolean().withDefault(const Constant(false))();
+
+  /// 软删除时间（非空表示已进入回收站）
+  DateTimeColumn get deletedAt => dateTime().nullable()();
 }

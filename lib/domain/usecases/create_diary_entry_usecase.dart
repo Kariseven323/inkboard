@@ -17,13 +17,14 @@ class CreateDiaryEntryUseCase {
   /// 执行创建日记条目
   Future<Result<int>> execute(CreateDiaryEntryParams params) async {
     try {
-      // 验证输入
-      if (params.title.trim().isEmpty) {
-        return Result.failure('标题不能为空');
-      }
-
-      if (params.content.trim().isEmpty) {
-        return Result.failure('内容不能为空');
+      // 非草稿模式严格校验，草稿放宽
+      if (!params.isDraft) {
+        if (params.title.trim().isEmpty) {
+          return Result.failure('标题不能为空');
+        }
+        if (params.content.trim().isEmpty) {
+          return Result.failure('内容不能为空');
+        }
       }
 
       // 处理标签
@@ -62,6 +63,7 @@ class CreateDiaryEntryUseCase {
         weather: params.weather,
         location: params.location,
         tags: tags,
+        isDraft: params.isDraft,
       );
 
       final entryId = await _diaryEntryRepository.createDiaryEntry(entry);
@@ -82,6 +84,7 @@ class CreateDiaryEntryParams {
   final String? location;
   final List<String> tagNames;
   final String? defaultTagColor;
+  final bool isDraft;
 
   CreateDiaryEntryParams({
     required this.title,
@@ -92,5 +95,6 @@ class CreateDiaryEntryParams {
     this.location,
     this.tagNames = const [],
     this.defaultTagColor,
+    this.isDraft = false,
   });
 }

@@ -10,12 +10,13 @@ import '../../core/services/database_key_service.dart';
 import '../tables/diary_entries.dart';
 import '../tables/tags.dart';
 import '../tables/diary_tags.dart';
+import '../tables/user_profile.dart';
 
 part 'app_database.g.dart';
 
 /// 应用数据库配置
 @lazySingleton
-@DriftDatabase(tables: [DiaryEntries, Tags, DiaryTags])
+@DriftDatabase(tables: [DiaryEntries, Tags, DiaryTags, UserProfiles])
 class AppDatabase extends _$AppDatabase {
   /// 构造函数（允许测试传入自定义执行器和密钥服务）
   AppDatabase({QueryExecutor? executor, DatabaseKeyService? keyService})
@@ -23,7 +24,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// 数据库版本
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 6;
 
   /// 数据库迁移逻辑
   @override
@@ -38,6 +39,16 @@ class AppDatabase extends _$AppDatabase {
         // 创建 FTS5 和索引（容错）
         await _tryEnsureFts5();
         await _ensureIndices();
+
+        // 创建默认用户资料
+        try {
+          await into(userProfiles).insert(
+            UserProfilesCompanion.insert(
+              id: const Value(1),
+              updatedAt: Value(DateTime.now()),
+            ),
+          );
+        } catch (_) {}
       },
       onUpgrade: (Migrator m, int from, int to) async {
         // v2: 引入 FTS5（基于标题）与必要索引
@@ -50,6 +61,29 @@ class AppDatabase extends _$AppDatabase {
         if (from < 3) {
           await _tryRebuildFts5WithContent();
         }
+
+        // v4: 新增用户资料表并插入默认记录
+        if (from < 4) {
+          await m.createTable(userProfiles);
+          try {
+            await into(userProfiles).insert(
+              UserProfilesCompanion.insert(
+                id: const Value(1),
+                updatedAt: Value(DateTime.now()),
+              ),
+            );
+          } catch (_) {}
+        }
+
+        // v5: diary_entries 新增 isDraft 字段（默认 false）
+        if (from < 5) {
+          await m.addColumn(diaryEntries, diaryEntries.isDraft);
+        }
+
+        // v6: diary_entries 新增 deletedAt 字段（软删除）
+        if (from < 6) {
+          await m.addColumn(diaryEntries, diaryEntries.deletedAt);
+        }
       },
       beforeOpen: (details) async {
         // 启用外键约束
@@ -57,6 +91,12 @@ class AppDatabase extends _$AppDatabase {
 
         // 设置 LIKE 不区分大小写
         await customStatement('PRAGMA case_sensitive_like = OFF');
+
+        // 回收站自动清理：清除超过30天的软删除条目
+        final threshold = DateTime.now().subtract(const Duration(days: 30));
+        await (delete(diaryEntries)
+              ..where((e) => e.deletedAt.isSmallerThanValue(threshold)))
+            .go();
       },
     );
   }

@@ -36,7 +36,9 @@ inkboard/
 │   ├── testing/            # 测试文档
 │   │   └── TDD_STRATEGY.md # TDD测试策略
 │   └── development/        # 开发文档
-│       └── CODING_STANDARDS.md # 开发规范
+│       ├── CODING_STANDARDS.md     # 开发规范
+│       ├── DB_MIGRATION_GUIDE.md   # 数据库迁移与验证指南
+│       └── USER_GUIDE.md           # 用户功能使用指南
 ├── lib/                    # 源代码目录
 ├── test/                   # 测试代码目录
 ├── pubspec.yaml           # 项目配置
@@ -177,6 +179,8 @@ dart run flutter_native_splash:create
 - [开发规范](docs/development/CODING_STANDARDS.md)
 - [架构设计](docs/architecture/ARCHITECTURE.md)
 - [测试策略](docs/testing/TDD_STRATEGY.md)
+ - [数据库迁移与验证指南](docs/development/DB_MIGRATION_GUIDE.md)
+ - [用户指南（设置/资料/草稿/回收站）](docs/development/USER_GUIDE.md)
 
 ## 许可证
 

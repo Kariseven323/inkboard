@@ -46,6 +46,7 @@ dependencies:
   flutter_screenutil: ^5.9.3
   shared_preferences: ^2.3.3
   markdown_widget: ^2.3.2+8
+  file_picker: ^8.1.2
 
   # 数据库
   drift: ^2.20.3

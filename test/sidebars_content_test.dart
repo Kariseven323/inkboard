@@ -34,6 +34,7 @@ void main() {
     expect(find.text('标签管理'), findsOneWidget);
     expect(find.text('收藏夹'), findsOneWidget);
     expect(find.text('统计分析'), findsOneWidget);
+    expect(find.text('回收站'), findsOneWidget);
     // 已去除：我的日记、高级搜索
     expect(find.text('我的日记'), findsNothing);
     expect(find.text('高级搜索'), findsNothing);

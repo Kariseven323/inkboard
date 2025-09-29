@@ -33,6 +33,9 @@ class DiaryEntry extends Equatable {
   /// 关联的标签列表
   final List<Tag> tags;
 
+  /// 是否草稿
+  final bool isDraft;
+
   const DiaryEntry({
     this.id,
     required this.title,
@@ -44,6 +47,7 @@ class DiaryEntry extends Equatable {
     this.weather,
     this.location,
     this.tags = const [],
+    this.isDraft = false,
   });
 
   /// 创建副本
@@ -58,6 +62,7 @@ class DiaryEntry extends Equatable {
     String? weather,
     String? location,
     List<Tag>? tags,
+    bool? isDraft,
   }) {
     return DiaryEntry(
       id: id ?? this.id,
@@ -70,6 +75,7 @@ class DiaryEntry extends Equatable {
       weather: weather ?? this.weather,
       location: location ?? this.location,
       tags: tags ?? this.tags,
+      isDraft: isDraft ?? this.isDraft,
     );
   }
 
@@ -116,5 +122,6 @@ class DiaryEntry extends Equatable {
     weather,
     location,
     tags,
+    isDraft,
   ];
 }

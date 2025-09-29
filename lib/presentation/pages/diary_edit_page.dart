@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,7 @@ import '../../core/theme/facebook_text_styles.dart';
 import '../../domain/entities/diary_entry.dart';
 import '../../domain/usecases/create_diary_entry_usecase.dart';
 import '../../domain/usecases/update_delete_diary_entry_usecase.dart';
+import '../../domain/repositories/user_profile_repository.dart';
 
 /// 日记编辑页面 - Facebook风格
 class DiaryEditPage extends ConsumerStatefulWidget {
@@ -30,6 +32,11 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
   bool _isFavorite = false;
   int? _moodScore;
   bool _previewOnlyOnNarrow = false;
+  bool _isDraft = false;
+  int? _draftId;
+  DateTime _lastEditAt = DateTime.now();
+  DateTime _lastAutoSavedAt = DateTime.fromMillisecondsSinceEpoch(0);
+  Timer? _autoSaveTimer;
 
   /// 是否为编辑模式
   bool get _isEditMode => widget.diaryEntry != null;
@@ -48,6 +55,7 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
       _contentController.text = entry.content;
       _isFavorite = entry.isFavorite;
       _moodScore = entry.moodScore;
+      _isDraft = entry.isDraft;
 
       // 将标签转换为字符串
       final tagNames = entry.tags.map((tag) => tag.name).join(' ');
@@ -56,12 +64,21 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
 
     // 内容变化时实时刷新预览
     _contentController.addListener(() {
+      _lastEditAt = DateTime.now();
       if (mounted) setState(() {});
+    });
+    _autoSaveTimer = Timer.periodic(const Duration(seconds: 5), (_) async {
+      final now = DateTime.now();
+      if (now.difference(_lastEditAt).inSeconds >= 2 &&
+          now.difference(_lastAutoSavedAt).inSeconds >= 5) {
+        await _autoSaveDraft(silent: true);
+      }
     });
   }
 
   @override
   void dispose() {
+    _autoSaveTimer?.cancel();
     _titleController.dispose();
     _contentController.dispose();
     _tagsController.dispose();
@@ -98,6 +115,16 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
         ),
       ),
       actions: [
+        TextButton(
+          onPressed: _isLoading ? null : () async { await _autoSaveDraft(silent: false); },
+          child: Text(
+            '暂存',
+            style: FacebookTextStyles.bodyMedium.copyWith(
+              color: _isLoading ? Colors.white60 : Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
         TextButton(
           onPressed: _isLoading ? null : _handleSave,
           child: Text(
@@ -367,6 +394,66 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
     );
   }
 
+  /// 自动保存草稿/手动暂存
+  Future<void> _autoSaveDraft({required bool silent}) async {
+    final title = _titleController.text.trim();
+    final content = _contentController.text.trim();
+    if (title.isEmpty && content.isEmpty) return; // 空不保存
+
+    try {
+      final tagNames = _tagsController.text
+          .split(' ')
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
+
+      if (_isEditMode || _draftId != null) {
+        final id = _isEditMode ? widget.diaryEntry!.id! : _draftId!;
+        final usecase = getIt<UpdateDiaryEntryUseCase>();
+        final r = await usecase.execute(UpdateDiaryEntryParams(
+          id: id,
+          title: _titleController.text,
+          content: _contentController.text,
+          isFavorite: _isFavorite,
+          moodScore: _moodScore,
+          tagNames: tagNames,
+          defaultTagColor: '#1877F2',
+          isDraft: true,
+        ));
+        if (r.isSuccess) {
+          _isDraft = true;
+          _lastAutoSavedAt = DateTime.now();
+          if (!silent && mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('已暂存'), backgroundColor: FacebookColors.info),
+            );
+          }
+        }
+      } else {
+        final usecase = getIt<CreateDiaryEntryUseCase>();
+        final r = await usecase.execute(CreateDiaryEntryParams(
+          title: _titleController.text,
+          content: _contentController.text,
+          isFavorite: _isFavorite,
+          moodScore: _moodScore,
+          tagNames: tagNames,
+          defaultTagColor: '#1877F2',
+          isDraft: true,
+        ));
+        if (r.isSuccess) {
+          _draftId = r.data;
+          _isDraft = true;
+          _lastAutoSavedAt = DateTime.now();
+          if (!silent && mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('已创建草稿'), backgroundColor: FacebookColors.info),
+            );
+          }
+        }
+      }
+    } catch (_) {}
+  }
+
   /// Markdown 工具栏（粗体/斜体/标题/列表/引用/代码块）
   Widget _buildMarkdownToolbar() {
     final iconColor = FacebookColors.iconGray;
@@ -383,6 +470,7 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
           _mdAction(Icons.format_list_bulleted, '列表', () => _prefixLines('- ')),
           _mdAction(Icons.format_quote, '引用', () => _prefixLines('> ')),
           _mdAction(Icons.code, '代码块', () => _wrapBlock('```\n', '\n```')),
+          _insertProfileMenu(),
         ].map((w) => _toolbarChip(w, iconColor)).toList(),
       ),
     );
@@ -404,6 +492,43 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
         ),
       ),
     );
+  }
+
+  Widget _insertProfileMenu() {
+    return PopupMenuButton<String>(
+      icon: const Icon(Icons.person, size: 20),
+      tooltip: '插入资料',
+      onSelected: (k) async {
+        final repo = getIt<UserProfileRepository>();
+        final p = await repo.getProfile();
+        String? v;
+        switch (k) {
+          case 'nickname': v = p?.nickname; break;
+          case 'signature': v = p?.signature; break;
+          case 'email': v = p?.email; break;
+          case 'region': v = p?.region; break;
+        }
+        if ((v ?? '').isEmpty) return;
+        _insertAtCursor(_contentController, v!);
+      },
+      itemBuilder: (context) => const [
+        PopupMenuItem(value: 'nickname', child: Text('插入昵称')),
+        PopupMenuItem(value: 'signature', child: Text('插入签名')),
+        PopupMenuItem(value: 'email', child: Text('插入邮箱')),
+        PopupMenuItem(value: 'region', child: Text('插入地区')),
+      ],
+    );
+  }
+
+  void _insertAtCursor(TextEditingController c, String text) {
+    final sel = c.selection;
+    final full = c.text;
+    final start = sel.start >= 0 ? sel.start : full.length;
+    final end = sel.end >= 0 ? sel.end : full.length;
+    final newText = full.replaceRange(start, end, text);
+    c.text = newText;
+    final caret = start + text.length;
+    c.selection = TextSelection.collapsed(offset: caret);
   }
 
   Widget _mdAction(IconData icon, String tooltip, VoidCallback onPressed) {
@@ -681,17 +806,18 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
           .where((tag) => tag.isNotEmpty)
           .toList();
 
-      if (_isEditMode) {
+      if (_isEditMode || _draftId != null) {
         // 编辑模式 - 更新现有日记
         final updateUseCase = getIt<UpdateDiaryEntryUseCase>();
         final params = UpdateDiaryEntryParams(
-          id: widget.diaryEntry!.id!,
+          id: _isEditMode ? widget.diaryEntry!.id! : _draftId!,
           title: _titleController.text.trim(),
           content: _contentController.text.trim(),
           isFavorite: _isFavorite,
           moodScore: _moodScore,
           tagNames: tagNames,
           defaultTagColor: '#1877F2',
+          isDraft: false,
         );
 
         final result = await updateUseCase.execute(params);
@@ -728,6 +854,7 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
           moodScore: _moodScore,
           tagNames: tagNames,
           defaultTagColor: '#1877F2',
+          isDraft: false,
         );
 
         final result = await createUseCase.execute(params);

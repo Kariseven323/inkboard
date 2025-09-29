@@ -116,6 +116,32 @@ class $DiaryEntriesTable extends DiaryEntries
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _isDraftMeta = const VerificationMeta(
+    'isDraft',
+  );
+  @override
+  late final GeneratedColumn<bool> isDraft = GeneratedColumn<bool>(
+    'is_draft',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_draft" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -127,6 +153,8 @@ class $DiaryEntriesTable extends DiaryEntries
     moodScore,
     weather,
     location,
+    isDraft,
+    deletedAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -199,6 +227,18 @@ class $DiaryEntriesTable extends DiaryEntries
         location.isAcceptableOrUnknown(data['location']!, _locationMeta),
       );
     }
+    if (data.containsKey('is_draft')) {
+      context.handle(
+        _isDraftMeta,
+        isDraft.isAcceptableOrUnknown(data['is_draft']!, _isDraftMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
     return context;
   }
 
@@ -244,6 +284,14 @@ class $DiaryEntriesTable extends DiaryEntries
         DriftSqlType.string,
         data['${effectivePrefix}location'],
       ),
+      isDraft: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_draft'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
     );
   }
 
@@ -280,6 +328,12 @@ class DiaryEntryData extends DataClass implements Insertable<DiaryEntryData> {
 
   /// 位置信息
   final String? location;
+
+  /// 是否为草稿
+  final bool isDraft;
+
+  /// 软删除时间（非空表示已进入回收站）
+  final DateTime? deletedAt;
   const DiaryEntryData({
     required this.id,
     required this.title,
@@ -290,6 +344,8 @@ class DiaryEntryData extends DataClass implements Insertable<DiaryEntryData> {
     this.moodScore,
     this.weather,
     this.location,
+    required this.isDraft,
+    this.deletedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -308,6 +364,10 @@ class DiaryEntryData extends DataClass implements Insertable<DiaryEntryData> {
     }
     if (!nullToAbsent || location != null) {
       map['location'] = Variable<String>(location);
+    }
+    map['is_draft'] = Variable<bool>(isDraft);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
     }
     return map;
   }
@@ -329,6 +389,10 @@ class DiaryEntryData extends DataClass implements Insertable<DiaryEntryData> {
       location: location == null && nullToAbsent
           ? const Value.absent()
           : Value(location),
+      isDraft: Value(isDraft),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
     );
   }
 
@@ -347,6 +411,8 @@ class DiaryEntryData extends DataClass implements Insertable<DiaryEntryData> {
       moodScore: serializer.fromJson<int?>(json['moodScore']),
       weather: serializer.fromJson<String?>(json['weather']),
       location: serializer.fromJson<String?>(json['location']),
+      isDraft: serializer.fromJson<bool>(json['isDraft']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
     );
   }
   @override
@@ -362,6 +428,8 @@ class DiaryEntryData extends DataClass implements Insertable<DiaryEntryData> {
       'moodScore': serializer.toJson<int?>(moodScore),
       'weather': serializer.toJson<String?>(weather),
       'location': serializer.toJson<String?>(location),
+      'isDraft': serializer.toJson<bool>(isDraft),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
     };
   }
 
@@ -375,6 +443,8 @@ class DiaryEntryData extends DataClass implements Insertable<DiaryEntryData> {
     Value<int?> moodScore = const Value.absent(),
     Value<String?> weather = const Value.absent(),
     Value<String?> location = const Value.absent(),
+    bool? isDraft,
+    Value<DateTime?> deletedAt = const Value.absent(),
   }) => DiaryEntryData(
     id: id ?? this.id,
     title: title ?? this.title,
@@ -385,6 +455,8 @@ class DiaryEntryData extends DataClass implements Insertable<DiaryEntryData> {
     moodScore: moodScore.present ? moodScore.value : this.moodScore,
     weather: weather.present ? weather.value : this.weather,
     location: location.present ? location.value : this.location,
+    isDraft: isDraft ?? this.isDraft,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
   );
   DiaryEntryData copyWithCompanion(DiaryEntriesCompanion data) {
     return DiaryEntryData(
@@ -399,6 +471,8 @@ class DiaryEntryData extends DataClass implements Insertable<DiaryEntryData> {
       moodScore: data.moodScore.present ? data.moodScore.value : this.moodScore,
       weather: data.weather.present ? data.weather.value : this.weather,
       location: data.location.present ? data.location.value : this.location,
+      isDraft: data.isDraft.present ? data.isDraft.value : this.isDraft,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
     );
   }
 
@@ -413,7 +487,9 @@ class DiaryEntryData extends DataClass implements Insertable<DiaryEntryData> {
           ..write('isFavorite: $isFavorite, ')
           ..write('moodScore: $moodScore, ')
           ..write('weather: $weather, ')
-          ..write('location: $location')
+          ..write('location: $location, ')
+          ..write('isDraft: $isDraft, ')
+          ..write('deletedAt: $deletedAt')
           ..write(')'))
         .toString();
   }
@@ -429,6 +505,8 @@ class DiaryEntryData extends DataClass implements Insertable<DiaryEntryData> {
     moodScore,
     weather,
     location,
+    isDraft,
+    deletedAt,
   );
   @override
   bool operator ==(Object other) =>
@@ -442,7 +520,9 @@ class DiaryEntryData extends DataClass implements Insertable<DiaryEntryData> {
           other.isFavorite == this.isFavorite &&
           other.moodScore == this.moodScore &&
           other.weather == this.weather &&
-          other.location == this.location);
+          other.location == this.location &&
+          other.isDraft == this.isDraft &&
+          other.deletedAt == this.deletedAt);
 }
 
 class DiaryEntriesCompanion extends UpdateCompanion<DiaryEntryData> {
@@ -455,6 +535,8 @@ class DiaryEntriesCompanion extends UpdateCompanion<DiaryEntryData> {
   final Value<int?> moodScore;
   final Value<String?> weather;
   final Value<String?> location;
+  final Value<bool> isDraft;
+  final Value<DateTime?> deletedAt;
   const DiaryEntriesCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -465,6 +547,8 @@ class DiaryEntriesCompanion extends UpdateCompanion<DiaryEntryData> {
     this.moodScore = const Value.absent(),
     this.weather = const Value.absent(),
     this.location = const Value.absent(),
+    this.isDraft = const Value.absent(),
+    this.deletedAt = const Value.absent(),
   });
   DiaryEntriesCompanion.insert({
     this.id = const Value.absent(),
@@ -476,6 +560,8 @@ class DiaryEntriesCompanion extends UpdateCompanion<DiaryEntryData> {
     this.moodScore = const Value.absent(),
     this.weather = const Value.absent(),
     this.location = const Value.absent(),
+    this.isDraft = const Value.absent(),
+    this.deletedAt = const Value.absent(),
   }) : title = Value(title),
        content = Value(content),
        createdAt = Value(createdAt),
@@ -490,6 +576,8 @@ class DiaryEntriesCompanion extends UpdateCompanion<DiaryEntryData> {
     Expression<int>? moodScore,
     Expression<String>? weather,
     Expression<String>? location,
+    Expression<bool>? isDraft,
+    Expression<DateTime>? deletedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -501,6 +589,8 @@ class DiaryEntriesCompanion extends UpdateCompanion<DiaryEntryData> {
       if (moodScore != null) 'mood_score': moodScore,
       if (weather != null) 'weather': weather,
       if (location != null) 'location': location,
+      if (isDraft != null) 'is_draft': isDraft,
+      if (deletedAt != null) 'deleted_at': deletedAt,
     });
   }
 
@@ -514,6 +604,8 @@ class DiaryEntriesCompanion extends UpdateCompanion<DiaryEntryData> {
     Value<int?>? moodScore,
     Value<String?>? weather,
     Value<String?>? location,
+    Value<bool>? isDraft,
+    Value<DateTime?>? deletedAt,
   }) {
     return DiaryEntriesCompanion(
       id: id ?? this.id,
@@ -525,6 +617,8 @@ class DiaryEntriesCompanion extends UpdateCompanion<DiaryEntryData> {
       moodScore: moodScore ?? this.moodScore,
       weather: weather ?? this.weather,
       location: location ?? this.location,
+      isDraft: isDraft ?? this.isDraft,
+      deletedAt: deletedAt ?? this.deletedAt,
     );
   }
 
@@ -558,6 +652,12 @@ class DiaryEntriesCompanion extends UpdateCompanion<DiaryEntryData> {
     if (location.present) {
       map['location'] = Variable<String>(location.value);
     }
+    if (isDraft.present) {
+      map['is_draft'] = Variable<bool>(isDraft.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
     return map;
   }
 
@@ -572,7 +672,9 @@ class DiaryEntriesCompanion extends UpdateCompanion<DiaryEntryData> {
           ..write('isFavorite: $isFavorite, ')
           ..write('moodScore: $moodScore, ')
           ..write('weather: $weather, ')
-          ..write('location: $location')
+          ..write('location: $location, ')
+          ..write('isDraft: $isDraft, ')
+          ..write('deletedAt: $deletedAt')
           ..write(')'))
         .toString();
   }
@@ -1270,12 +1372,577 @@ class DiaryTagsCompanion extends UpdateCompanion<DiaryTagData> {
   }
 }
 
+class $UserProfilesTable extends UserProfiles
+    with TableInfo<$UserProfilesTable, UserProfileData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $UserProfilesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _avatarMeta = const VerificationMeta('avatar');
+  @override
+  late final GeneratedColumn<Uint8List> avatar = GeneratedColumn<Uint8List>(
+    'avatar',
+    aliasedName,
+    true,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nicknameMeta = const VerificationMeta(
+    'nickname',
+  );
+  @override
+  late final GeneratedColumn<String> nickname = GeneratedColumn<String>(
+    'nickname',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _signatureMeta = const VerificationMeta(
+    'signature',
+  );
+  @override
+  late final GeneratedColumn<String> signature = GeneratedColumn<String>(
+    'signature',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _genderMeta = const VerificationMeta('gender');
+  @override
+  late final GeneratedColumn<String> gender = GeneratedColumn<String>(
+    'gender',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _birthdayMeta = const VerificationMeta(
+    'birthday',
+  );
+  @override
+  late final GeneratedColumn<DateTime> birthday = GeneratedColumn<DateTime>(
+    'birthday',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _regionMeta = const VerificationMeta('region');
+  @override
+  late final GeneratedColumn<String> region = GeneratedColumn<String>(
+    'region',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _emailMeta = const VerificationMeta('email');
+  @override
+  late final GeneratedColumn<String> email = GeneratedColumn<String>(
+    'email',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    avatar,
+    nickname,
+    signature,
+    gender,
+    birthday,
+    region,
+    email,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'user_profiles';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<UserProfileData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('avatar')) {
+      context.handle(
+        _avatarMeta,
+        avatar.isAcceptableOrUnknown(data['avatar']!, _avatarMeta),
+      );
+    }
+    if (data.containsKey('nickname')) {
+      context.handle(
+        _nicknameMeta,
+        nickname.isAcceptableOrUnknown(data['nickname']!, _nicknameMeta),
+      );
+    }
+    if (data.containsKey('signature')) {
+      context.handle(
+        _signatureMeta,
+        signature.isAcceptableOrUnknown(data['signature']!, _signatureMeta),
+      );
+    }
+    if (data.containsKey('gender')) {
+      context.handle(
+        _genderMeta,
+        gender.isAcceptableOrUnknown(data['gender']!, _genderMeta),
+      );
+    }
+    if (data.containsKey('birthday')) {
+      context.handle(
+        _birthdayMeta,
+        birthday.isAcceptableOrUnknown(data['birthday']!, _birthdayMeta),
+      );
+    }
+    if (data.containsKey('region')) {
+      context.handle(
+        _regionMeta,
+        region.isAcceptableOrUnknown(data['region']!, _regionMeta),
+      );
+    }
+    if (data.containsKey('email')) {
+      context.handle(
+        _emailMeta,
+        email.isAcceptableOrUnknown(data['email']!, _emailMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  UserProfileData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return UserProfileData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      avatar: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}avatar'],
+      ),
+      nickname: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}nickname'],
+      ),
+      signature: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}signature'],
+      ),
+      gender: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}gender'],
+      ),
+      birthday: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}birthday'],
+      ),
+      region: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}region'],
+      ),
+      email: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}email'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      ),
+    );
+  }
+
+  @override
+  $UserProfilesTable createAlias(String alias) {
+    return $UserProfilesTable(attachedDatabase, alias);
+  }
+}
+
+class UserProfileData extends DataClass implements Insertable<UserProfileData> {
+  /// 主键ID（固定为1）
+  final int id;
+
+  /// 头像（跨端以 bytes 存储）
+  final Uint8List? avatar;
+
+  /// 昵称
+  final String? nickname;
+
+  /// 个性签名
+  final String? signature;
+
+  /// 性别（可空：male/female/other）
+  final String? gender;
+
+  /// 生日
+  final DateTime? birthday;
+
+  /// 地区
+  final String? region;
+
+  /// 邮箱
+  final String? email;
+
+  /// 更新时间
+  final DateTime? updatedAt;
+  const UserProfileData({
+    required this.id,
+    this.avatar,
+    this.nickname,
+    this.signature,
+    this.gender,
+    this.birthday,
+    this.region,
+    this.email,
+    this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    if (!nullToAbsent || avatar != null) {
+      map['avatar'] = Variable<Uint8List>(avatar);
+    }
+    if (!nullToAbsent || nickname != null) {
+      map['nickname'] = Variable<String>(nickname);
+    }
+    if (!nullToAbsent || signature != null) {
+      map['signature'] = Variable<String>(signature);
+    }
+    if (!nullToAbsent || gender != null) {
+      map['gender'] = Variable<String>(gender);
+    }
+    if (!nullToAbsent || birthday != null) {
+      map['birthday'] = Variable<DateTime>(birthday);
+    }
+    if (!nullToAbsent || region != null) {
+      map['region'] = Variable<String>(region);
+    }
+    if (!nullToAbsent || email != null) {
+      map['email'] = Variable<String>(email);
+    }
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<DateTime>(updatedAt);
+    }
+    return map;
+  }
+
+  UserProfilesCompanion toCompanion(bool nullToAbsent) {
+    return UserProfilesCompanion(
+      id: Value(id),
+      avatar: avatar == null && nullToAbsent
+          ? const Value.absent()
+          : Value(avatar),
+      nickname: nickname == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nickname),
+      signature: signature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(signature),
+      gender: gender == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gender),
+      birthday: birthday == null && nullToAbsent
+          ? const Value.absent()
+          : Value(birthday),
+      region: region == null && nullToAbsent
+          ? const Value.absent()
+          : Value(region),
+      email: email == null && nullToAbsent
+          ? const Value.absent()
+          : Value(email),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
+    );
+  }
+
+  factory UserProfileData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return UserProfileData(
+      id: serializer.fromJson<int>(json['id']),
+      avatar: serializer.fromJson<Uint8List?>(json['avatar']),
+      nickname: serializer.fromJson<String?>(json['nickname']),
+      signature: serializer.fromJson<String?>(json['signature']),
+      gender: serializer.fromJson<String?>(json['gender']),
+      birthday: serializer.fromJson<DateTime?>(json['birthday']),
+      region: serializer.fromJson<String?>(json['region']),
+      email: serializer.fromJson<String?>(json['email']),
+      updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'avatar': serializer.toJson<Uint8List?>(avatar),
+      'nickname': serializer.toJson<String?>(nickname),
+      'signature': serializer.toJson<String?>(signature),
+      'gender': serializer.toJson<String?>(gender),
+      'birthday': serializer.toJson<DateTime?>(birthday),
+      'region': serializer.toJson<String?>(region),
+      'email': serializer.toJson<String?>(email),
+      'updatedAt': serializer.toJson<DateTime?>(updatedAt),
+    };
+  }
+
+  UserProfileData copyWith({
+    int? id,
+    Value<Uint8List?> avatar = const Value.absent(),
+    Value<String?> nickname = const Value.absent(),
+    Value<String?> signature = const Value.absent(),
+    Value<String?> gender = const Value.absent(),
+    Value<DateTime?> birthday = const Value.absent(),
+    Value<String?> region = const Value.absent(),
+    Value<String?> email = const Value.absent(),
+    Value<DateTime?> updatedAt = const Value.absent(),
+  }) => UserProfileData(
+    id: id ?? this.id,
+    avatar: avatar.present ? avatar.value : this.avatar,
+    nickname: nickname.present ? nickname.value : this.nickname,
+    signature: signature.present ? signature.value : this.signature,
+    gender: gender.present ? gender.value : this.gender,
+    birthday: birthday.present ? birthday.value : this.birthday,
+    region: region.present ? region.value : this.region,
+    email: email.present ? email.value : this.email,
+    updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
+  );
+  UserProfileData copyWithCompanion(UserProfilesCompanion data) {
+    return UserProfileData(
+      id: data.id.present ? data.id.value : this.id,
+      avatar: data.avatar.present ? data.avatar.value : this.avatar,
+      nickname: data.nickname.present ? data.nickname.value : this.nickname,
+      signature: data.signature.present ? data.signature.value : this.signature,
+      gender: data.gender.present ? data.gender.value : this.gender,
+      birthday: data.birthday.present ? data.birthday.value : this.birthday,
+      region: data.region.present ? data.region.value : this.region,
+      email: data.email.present ? data.email.value : this.email,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UserProfileData(')
+          ..write('id: $id, ')
+          ..write('avatar: $avatar, ')
+          ..write('nickname: $nickname, ')
+          ..write('signature: $signature, ')
+          ..write('gender: $gender, ')
+          ..write('birthday: $birthday, ')
+          ..write('region: $region, ')
+          ..write('email: $email, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    $driftBlobEquality.hash(avatar),
+    nickname,
+    signature,
+    gender,
+    birthday,
+    region,
+    email,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is UserProfileData &&
+          other.id == this.id &&
+          $driftBlobEquality.equals(other.avatar, this.avatar) &&
+          other.nickname == this.nickname &&
+          other.signature == this.signature &&
+          other.gender == this.gender &&
+          other.birthday == this.birthday &&
+          other.region == this.region &&
+          other.email == this.email &&
+          other.updatedAt == this.updatedAt);
+}
+
+class UserProfilesCompanion extends UpdateCompanion<UserProfileData> {
+  final Value<int> id;
+  final Value<Uint8List?> avatar;
+  final Value<String?> nickname;
+  final Value<String?> signature;
+  final Value<String?> gender;
+  final Value<DateTime?> birthday;
+  final Value<String?> region;
+  final Value<String?> email;
+  final Value<DateTime?> updatedAt;
+  const UserProfilesCompanion({
+    this.id = const Value.absent(),
+    this.avatar = const Value.absent(),
+    this.nickname = const Value.absent(),
+    this.signature = const Value.absent(),
+    this.gender = const Value.absent(),
+    this.birthday = const Value.absent(),
+    this.region = const Value.absent(),
+    this.email = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  UserProfilesCompanion.insert({
+    this.id = const Value.absent(),
+    this.avatar = const Value.absent(),
+    this.nickname = const Value.absent(),
+    this.signature = const Value.absent(),
+    this.gender = const Value.absent(),
+    this.birthday = const Value.absent(),
+    this.region = const Value.absent(),
+    this.email = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  static Insertable<UserProfileData> custom({
+    Expression<int>? id,
+    Expression<Uint8List>? avatar,
+    Expression<String>? nickname,
+    Expression<String>? signature,
+    Expression<String>? gender,
+    Expression<DateTime>? birthday,
+    Expression<String>? region,
+    Expression<String>? email,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (avatar != null) 'avatar': avatar,
+      if (nickname != null) 'nickname': nickname,
+      if (signature != null) 'signature': signature,
+      if (gender != null) 'gender': gender,
+      if (birthday != null) 'birthday': birthday,
+      if (region != null) 'region': region,
+      if (email != null) 'email': email,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  UserProfilesCompanion copyWith({
+    Value<int>? id,
+    Value<Uint8List?>? avatar,
+    Value<String?>? nickname,
+    Value<String?>? signature,
+    Value<String?>? gender,
+    Value<DateTime?>? birthday,
+    Value<String?>? region,
+    Value<String?>? email,
+    Value<DateTime?>? updatedAt,
+  }) {
+    return UserProfilesCompanion(
+      id: id ?? this.id,
+      avatar: avatar ?? this.avatar,
+      nickname: nickname ?? this.nickname,
+      signature: signature ?? this.signature,
+      gender: gender ?? this.gender,
+      birthday: birthday ?? this.birthday,
+      region: region ?? this.region,
+      email: email ?? this.email,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (avatar.present) {
+      map['avatar'] = Variable<Uint8List>(avatar.value);
+    }
+    if (nickname.present) {
+      map['nickname'] = Variable<String>(nickname.value);
+    }
+    if (signature.present) {
+      map['signature'] = Variable<String>(signature.value);
+    }
+    if (gender.present) {
+      map['gender'] = Variable<String>(gender.value);
+    }
+    if (birthday.present) {
+      map['birthday'] = Variable<DateTime>(birthday.value);
+    }
+    if (region.present) {
+      map['region'] = Variable<String>(region.value);
+    }
+    if (email.present) {
+      map['email'] = Variable<String>(email.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UserProfilesCompanion(')
+          ..write('id: $id, ')
+          ..write('avatar: $avatar, ')
+          ..write('nickname: $nickname, ')
+          ..write('signature: $signature, ')
+          ..write('gender: $gender, ')
+          ..write('birthday: $birthday, ')
+          ..write('region: $region, ')
+          ..write('email: $email, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $DiaryEntriesTable diaryEntries = $DiaryEntriesTable(this);
   late final $TagsTable tags = $TagsTable(this);
   late final $DiaryTagsTable diaryTags = $DiaryTagsTable(this);
+  late final $UserProfilesTable userProfiles = $UserProfilesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1284,6 +1951,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     diaryEntries,
     tags,
     diaryTags,
+    userProfiles,
   ];
 }
 
@@ -1298,6 +1966,8 @@ typedef $$DiaryEntriesTableCreateCompanionBuilder =
       Value<int?> moodScore,
       Value<String?> weather,
       Value<String?> location,
+      Value<bool> isDraft,
+      Value<DateTime?> deletedAt,
     });
 typedef $$DiaryEntriesTableUpdateCompanionBuilder =
     DiaryEntriesCompanion Function({
@@ -1310,6 +1980,8 @@ typedef $$DiaryEntriesTableUpdateCompanionBuilder =
       Value<int?> moodScore,
       Value<String?> weather,
       Value<String?> location,
+      Value<bool> isDraft,
+      Value<DateTime?> deletedAt,
     });
 
 class $$DiaryEntriesTableFilterComposer
@@ -1363,6 +2035,16 @@ class $$DiaryEntriesTableFilterComposer
 
   ColumnFilters<String> get location => $composableBuilder(
     column: $table.location,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isDraft => $composableBuilder(
+    column: $table.isDraft,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -1420,6 +2102,16 @@ class $$DiaryEntriesTableOrderingComposer
     column: $table.location,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get isDraft => $composableBuilder(
+    column: $table.isDraft,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$DiaryEntriesTableAnnotationComposer
@@ -1459,6 +2151,12 @@ class $$DiaryEntriesTableAnnotationComposer
 
   GeneratedColumn<String> get location =>
       $composableBuilder(column: $table.location, builder: (column) => column);
+
+  GeneratedColumn<bool> get isDraft =>
+      $composableBuilder(column: $table.isDraft, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
 }
 
 class $$DiaryEntriesTableTableManager
@@ -1501,6 +2199,8 @@ class $$DiaryEntriesTableTableManager
                 Value<int?> moodScore = const Value.absent(),
                 Value<String?> weather = const Value.absent(),
                 Value<String?> location = const Value.absent(),
+                Value<bool> isDraft = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
               }) => DiaryEntriesCompanion(
                 id: id,
                 title: title,
@@ -1511,6 +2211,8 @@ class $$DiaryEntriesTableTableManager
                 moodScore: moodScore,
                 weather: weather,
                 location: location,
+                isDraft: isDraft,
+                deletedAt: deletedAt,
               ),
           createCompanionCallback:
               ({
@@ -1523,6 +2225,8 @@ class $$DiaryEntriesTableTableManager
                 Value<int?> moodScore = const Value.absent(),
                 Value<String?> weather = const Value.absent(),
                 Value<String?> location = const Value.absent(),
+                Value<bool> isDraft = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
               }) => DiaryEntriesCompanion.insert(
                 id: id,
                 title: title,
@@ -1533,6 +2237,8 @@ class $$DiaryEntriesTableTableManager
                 moodScore: moodScore,
                 weather: weather,
                 location: location,
+                isDraft: isDraft,
+                deletedAt: deletedAt,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -1932,6 +2638,276 @@ typedef $$DiaryTagsTableProcessedTableManager =
       DiaryTagData,
       PrefetchHooks Function()
     >;
+typedef $$UserProfilesTableCreateCompanionBuilder =
+    UserProfilesCompanion Function({
+      Value<int> id,
+      Value<Uint8List?> avatar,
+      Value<String?> nickname,
+      Value<String?> signature,
+      Value<String?> gender,
+      Value<DateTime?> birthday,
+      Value<String?> region,
+      Value<String?> email,
+      Value<DateTime?> updatedAt,
+    });
+typedef $$UserProfilesTableUpdateCompanionBuilder =
+    UserProfilesCompanion Function({
+      Value<int> id,
+      Value<Uint8List?> avatar,
+      Value<String?> nickname,
+      Value<String?> signature,
+      Value<String?> gender,
+      Value<DateTime?> birthday,
+      Value<String?> region,
+      Value<String?> email,
+      Value<DateTime?> updatedAt,
+    });
+
+class $$UserProfilesTableFilterComposer
+    extends Composer<_$AppDatabase, $UserProfilesTable> {
+  $$UserProfilesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get avatar => $composableBuilder(
+    column: $table.avatar,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nickname => $composableBuilder(
+    column: $table.nickname,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get signature => $composableBuilder(
+    column: $table.signature,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get gender => $composableBuilder(
+    column: $table.gender,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get birthday => $composableBuilder(
+    column: $table.birthday,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get region => $composableBuilder(
+    column: $table.region,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$UserProfilesTableOrderingComposer
+    extends Composer<_$AppDatabase, $UserProfilesTable> {
+  $$UserProfilesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get avatar => $composableBuilder(
+    column: $table.avatar,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nickname => $composableBuilder(
+    column: $table.nickname,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get signature => $composableBuilder(
+    column: $table.signature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get gender => $composableBuilder(
+    column: $table.gender,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get birthday => $composableBuilder(
+    column: $table.birthday,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get region => $composableBuilder(
+    column: $table.region,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$UserProfilesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $UserProfilesTable> {
+  $$UserProfilesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get avatar =>
+      $composableBuilder(column: $table.avatar, builder: (column) => column);
+
+  GeneratedColumn<String> get nickname =>
+      $composableBuilder(column: $table.nickname, builder: (column) => column);
+
+  GeneratedColumn<String> get signature =>
+      $composableBuilder(column: $table.signature, builder: (column) => column);
+
+  GeneratedColumn<String> get gender =>
+      $composableBuilder(column: $table.gender, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get birthday =>
+      $composableBuilder(column: $table.birthday, builder: (column) => column);
+
+  GeneratedColumn<String> get region =>
+      $composableBuilder(column: $table.region, builder: (column) => column);
+
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$UserProfilesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $UserProfilesTable,
+          UserProfileData,
+          $$UserProfilesTableFilterComposer,
+          $$UserProfilesTableOrderingComposer,
+          $$UserProfilesTableAnnotationComposer,
+          $$UserProfilesTableCreateCompanionBuilder,
+          $$UserProfilesTableUpdateCompanionBuilder,
+          (
+            UserProfileData,
+            BaseReferences<_$AppDatabase, $UserProfilesTable, UserProfileData>,
+          ),
+          UserProfileData,
+          PrefetchHooks Function()
+        > {
+  $$UserProfilesTableTableManager(_$AppDatabase db, $UserProfilesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$UserProfilesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$UserProfilesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$UserProfilesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<Uint8List?> avatar = const Value.absent(),
+                Value<String?> nickname = const Value.absent(),
+                Value<String?> signature = const Value.absent(),
+                Value<String?> gender = const Value.absent(),
+                Value<DateTime?> birthday = const Value.absent(),
+                Value<String?> region = const Value.absent(),
+                Value<String?> email = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+              }) => UserProfilesCompanion(
+                id: id,
+                avatar: avatar,
+                nickname: nickname,
+                signature: signature,
+                gender: gender,
+                birthday: birthday,
+                region: region,
+                email: email,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<Uint8List?> avatar = const Value.absent(),
+                Value<String?> nickname = const Value.absent(),
+                Value<String?> signature = const Value.absent(),
+                Value<String?> gender = const Value.absent(),
+                Value<DateTime?> birthday = const Value.absent(),
+                Value<String?> region = const Value.absent(),
+                Value<String?> email = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+              }) => UserProfilesCompanion.insert(
+                id: id,
+                avatar: avatar,
+                nickname: nickname,
+                signature: signature,
+                gender: gender,
+                birthday: birthday,
+                region: region,
+                email: email,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$UserProfilesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $UserProfilesTable,
+      UserProfileData,
+      $$UserProfilesTableFilterComposer,
+      $$UserProfilesTableOrderingComposer,
+      $$UserProfilesTableAnnotationComposer,
+      $$UserProfilesTableCreateCompanionBuilder,
+      $$UserProfilesTableUpdateCompanionBuilder,
+      (
+        UserProfileData,
+        BaseReferences<_$AppDatabase, $UserProfilesTable, UserProfileData>,
+      ),
+      UserProfileData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1941,4 +2917,6 @@ class $AppDatabaseManager {
   $$TagsTableTableManager get tags => $$TagsTableTableManager(_db, _db.tags);
   $$DiaryTagsTableTableManager get diaryTags =>
       $$DiaryTagsTableTableManager(_db, _db.diaryTags);
+  $$UserProfilesTableTableManager get userProfiles =>
+      $$UserProfilesTableTableManager(_db, _db.userProfiles);
 }

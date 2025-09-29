@@ -39,6 +39,22 @@ class _RepoThrows implements DiaryEntryRepository {
   Future<bool> toggleFavorite(int id) async => false;
   @override
   Future<bool> updateDiaryEntry(DiaryEntry entry) async => false;
+
+  // 软删除/回收站桩实现
+  @override
+  Future<bool> softDeleteDiaryEntry(int id) async => false;
+  @override
+  Future<bool> softDeleteDiaryEntries(List<int> ids) async => false;
+  @override
+  Stream<List<DiaryEntry>> getDeletedDiaryEntries() => Stream.value(const []);
+  @override
+  Future<bool> restoreDiaryEntry(int id) async => false;
+  @override
+  Future<bool> restoreDiaryEntries(List<int> ids) async => false;
+  @override
+  Future<bool> purgeDiaryEntry(int id) async => false;
+  @override
+  Future<bool> purgeDiaryEntries(List<int> ids) async => false;
 }
 
 void main() {

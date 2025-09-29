@@ -46,4 +46,20 @@ abstract class DiaryEntryRepository {
 
   /// 批量删除日记条目
   Future<bool> deleteDiaryEntries(List<int> ids);
+
+  // ===== 回收站（软删除） =====
+  /// 软删除到回收站
+  Future<bool> softDeleteDiaryEntry(int id);
+  Future<bool> softDeleteDiaryEntries(List<int> ids);
+
+  /// 回收站条目流
+  Stream<List<DiaryEntry>> getDeletedDiaryEntries();
+
+  /// 从回收站恢复
+  Future<bool> restoreDiaryEntry(int id);
+  Future<bool> restoreDiaryEntries(List<int> ids);
+
+  /// 彻底删除（仅对回收站内条目）
+  Future<bool> purgeDiaryEntry(int id);
+  Future<bool> purgeDiaryEntries(List<int> ids);
 }

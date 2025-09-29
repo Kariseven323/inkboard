@@ -12,6 +12,7 @@ import '../../core/theme/facebook_sizes.dart';
 import '../../core/theme/facebook_text_styles.dart';
 import '../../domain/entities/diary_entry.dart';
 import '../../domain/usecases/update_delete_diary_entry_usecase.dart';
+import '../../domain/usecases/soft_delete_diary_entry_usecase.dart';
 
 /// 主页面 - 显示发布器和时间线内容
 class HomePage extends ConsumerWidget {
@@ -508,10 +509,24 @@ class HomePage extends ConsumerWidget {
   /// 删除日记
   Future<void> _deleteDiary(BuildContext context, DiaryEntry entry) async {
     try {
-      final deleteUseCase = getIt<DeleteDiaryEntryUseCase>();
-      final result = await deleteUseCase.execute(entry.id!);
+      // 优先软删除（回收站），若未注册则回退为硬删除
+      bool success = false;
+      String? failMsg;
+      String successMsg = '日记已移入回收站';
+      try {
+        final soft = getIt<SoftDeleteDiaryEntryUseCase>();
+        final r = await soft.execute(entry.id!);
+        success = r.isSuccess;
+        if (!success) failMsg = r.error;
+      } catch (_) {
+        final deleteUseCase = getIt<DeleteDiaryEntryUseCase>();
+        final r = await deleteUseCase.execute(entry.id!);
+        success = r.isSuccess;
+        if (!success) failMsg = r.error;
+        successMsg = '日记已删除';
+      }
 
-      if (result.isSuccess) {
+      if (success) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -523,7 +538,7 @@ class HomePage extends ConsumerWidget {
                     size: FacebookSizes.iconSmall,
                   ),
                   SizedBox(width: FacebookSizes.spacing8),
-                  Text('日记已删除'),
+                  Text(successMsg),
                 ],
               ),
               backgroundColor: FacebookColors.success,
@@ -546,7 +561,7 @@ class HomePage extends ConsumerWidget {
                     size: FacebookSizes.iconSmall,
                   ),
                   SizedBox(width: FacebookSizes.spacing8),
-                  Expanded(child: Text(result.error ?? '删除失败')),
+                  Expanded(child: Text('删除失败：${failMsg ?? ''}')),
                 ],
               ),
               backgroundColor: FacebookColors.error,
