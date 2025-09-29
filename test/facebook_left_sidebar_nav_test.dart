@@ -13,10 +13,7 @@ void main() {
           designSize: Size(390, 844),
           child: MaterialApp(
             home: Scaffold(
-              body: SizedBox(
-                width: 240,
-                child: FacebookLeftSidebar(),
-              ),
+              body: SizedBox(width: 240, child: FacebookLeftSidebar()),
             ),
           ),
         ),

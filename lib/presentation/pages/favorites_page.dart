@@ -35,7 +35,9 @@ class FavoritesPage extends ConsumerWidget {
                     isFavorite: e.isFavorite,
                     onTap: () {},
                     onFavoriteTap: () async {
-                      await getIt<UpdateDiaryEntryUseCase>().toggleFavorite(e.id!);
+                      await getIt<UpdateDiaryEntryUseCase>().toggleFavorite(
+                        e.id!,
+                      );
                     },
                     onEditTap: () {},
                     onDeleteTap: () {},

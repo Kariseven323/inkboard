@@ -32,10 +32,12 @@ void main() {
     final tile = find.widgetWithText(ListTile, '无效色');
     expect(tile, findsOneWidget);
     // 找到对应的圆点
-    final avatar = find.descendant(of: tile, matching: find.byType(CircleAvatar));
+    final avatar = find.descendant(
+      of: tile,
+      matching: find.byType(CircleAvatar),
+    );
     expect(avatar, findsOneWidget);
     final w = tester.widget<CircleAvatar>(avatar);
     expect(w.backgroundColor, equals(FacebookColors.primary));
   });
 }
-

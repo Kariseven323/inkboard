@@ -10,8 +10,12 @@ void main() {
     final repo = InMemoryTagRepository();
     final uc = TagManagementUseCase(repo);
     final now = DateTime.now();
-    await repo.createTag(Tag(name: 'A', color: '#1', createdAt: now, usageCount: 5));
-    await repo.createTag(Tag(name: 'B', color: '#2', createdAt: now, usageCount: 1));
+    await repo.createTag(
+      Tag(name: 'A', color: '#1', createdAt: now, usageCount: 5),
+    );
+    await repo.createTag(
+      Tag(name: 'B', color: '#2', createdAt: now, usageCount: 1),
+    );
     final popular = await uc.getPopularTags(limit: 1).first;
     expect(popular.length, 1);
     final recent = await uc.getRecentTags(limit: 1).first;
@@ -20,4 +24,3 @@ void main() {
     expect(search.first.name, 'A');
   });
 }
-

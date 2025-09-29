@@ -15,7 +15,7 @@ class TagRepositoryImpl implements TagRepository {
   @override
   Stream<List<Tag>> getAllTags() {
     return (_database.select(_database.tags)
-        ..orderBy([(tag) => OrderingTerm.asc(tag.name)]))
+          ..orderBy([(tag) => OrderingTerm.asc(tag.name)]))
         .watch()
         .map(_mapToEntities);
   }
@@ -40,30 +40,34 @@ class TagRepositoryImpl implements TagRepository {
 
   @override
   Future<int> createTag(Tag tag) async {
-    return await _database.into(_database.tags).insert(
-      TagsCompanion.insert(
-        name: tag.name,
-        color: Value(tag.color),
-        createdAt: tag.createdAt,
-        usageCount: Value(tag.usageCount),
-        description: Value(tag.description),
-      ),
-    );
+    return await _database
+        .into(_database.tags)
+        .insert(
+          TagsCompanion.insert(
+            name: tag.name,
+            color: Value(tag.color),
+            createdAt: tag.createdAt,
+            usageCount: Value(tag.usageCount),
+            description: Value(tag.description),
+          ),
+        );
   }
 
   @override
   Future<bool> updateTag(Tag tag) async {
     if (tag.id == null) return false;
 
-    final updateCount = await (_database.update(_database.tags)
-      ..where((t) => t.id.equals(tag.id!))).write(
-      TagsCompanion(
-        name: Value(tag.name),
-        color: Value(tag.color),
-        usageCount: Value(tag.usageCount),
-        description: Value(tag.description),
-      ),
-    );
+    final updateCount =
+        await (_database.update(
+          _database.tags,
+        )..where((t) => t.id.equals(tag.id!))).write(
+          TagsCompanion(
+            name: Value(tag.name),
+            color: Value(tag.color),
+            usageCount: Value(tag.usageCount),
+            description: Value(tag.description),
+          ),
+        );
 
     return updateCount > 0;
   }
@@ -72,12 +76,14 @@ class TagRepositoryImpl implements TagRepository {
   Future<bool> deleteTag(int id) async {
     return await _database.transaction(() async {
       // 首先删除所有相关的日记-标签关联
-      await (_database.delete(_database.diaryTags)
-        ..where((dt) => dt.tagId.equals(id))).go();
+      await (_database.delete(
+        _database.diaryTags,
+      )..where((dt) => dt.tagId.equals(id))).go();
 
       // 然后删除标签本身
-      final deleteCount = await (_database.delete(_database.tags)
-        ..where((tag) => tag.id.equals(id))).go();
+      final deleteCount = await (_database.delete(
+        _database.tags,
+      )..where((tag) => tag.id.equals(id))).go();
 
       return deleteCount > 0;
     });
@@ -88,10 +94,10 @@ class TagRepositoryImpl implements TagRepository {
     if (query.trim().isEmpty) return Stream.value([]);
 
     return (_database.select(_database.tags)
-        ..where((tag) =>
-            tag.name.contains(query) |
-            tag.description.contains(query))
-        ..orderBy([(tag) => OrderingTerm.asc(tag.name)]))
+          ..where(
+            (tag) => tag.name.contains(query) | tag.description.contains(query),
+          )
+          ..orderBy([(tag) => OrderingTerm.asc(tag.name)]))
         .watch()
         .map(_mapToEntities);
   }
@@ -99,8 +105,8 @@ class TagRepositoryImpl implements TagRepository {
   @override
   Stream<List<Tag>> getPopularTags({int limit = 10}) {
     return (_database.select(_database.tags)
-        ..orderBy([(tag) => OrderingTerm.desc(tag.usageCount)])
-        ..limit(limit))
+          ..orderBy([(tag) => OrderingTerm.desc(tag.usageCount)])
+          ..limit(limit))
         .watch()
         .map(_mapToEntities);
   }
@@ -108,8 +114,8 @@ class TagRepositoryImpl implements TagRepository {
   @override
   Stream<List<Tag>> getRecentTags({int limit = 5}) {
     return (_database.select(_database.tags)
-        ..orderBy([(tag) => OrderingTerm.desc(tag.createdAt)])
-        ..limit(limit))
+          ..orderBy([(tag) => OrderingTerm.desc(tag.createdAt)])
+          ..limit(limit))
         .watch()
         .map(_mapToEntities);
   }
@@ -119,12 +125,10 @@ class TagRepositoryImpl implements TagRepository {
     final current = await getTagById(tagId);
     if (current == null) return false;
 
-    final updateCount = await (_database.update(_database.tags)
-      ..where((tag) => tag.id.equals(tagId))).write(
-      TagsCompanion(
-        usageCount: Value(current.usageCount + 1),
-      ),
-    );
+    final updateCount =
+        await (_database.update(_database.tags)
+              ..where((tag) => tag.id.equals(tagId)))
+            .write(TagsCompanion(usageCount: Value(current.usageCount + 1)));
 
     return updateCount > 0;
   }
@@ -135,12 +139,10 @@ class TagRepositoryImpl implements TagRepository {
     if (current == null) return false;
 
     final newCount = (current.usageCount - 1).clamp(0, double.infinity).toInt();
-    final updateCount = await (_database.update(_database.tags)
-      ..where((tag) => tag.id.equals(tagId))).write(
-      TagsCompanion(
-        usageCount: Value(newCount),
-      ),
-    );
+    final updateCount =
+        await (_database.update(_database.tags)
+              ..where((tag) => tag.id.equals(tagId)))
+            .write(TagsCompanion(usageCount: Value(newCount)));
 
     return updateCount > 0;
   }
@@ -151,12 +153,14 @@ class TagRepositoryImpl implements TagRepository {
 
     return await _database.transaction(() async {
       // 删除所有相关的日记-标签关联
-      await (_database.delete(_database.diaryTags)
-        ..where((dt) => dt.tagId.isIn(ids))).go();
+      await (_database.delete(
+        _database.diaryTags,
+      )..where((dt) => dt.tagId.isIn(ids))).go();
 
       // 批量删除标签
-      final deleteCount = await (_database.delete(_database.tags)
-        ..where((tag) => tag.id.isIn(ids))).go();
+      final deleteCount = await (_database.delete(
+        _database.tags,
+      )..where((tag) => tag.id.isIn(ids))).go();
 
       return deleteCount > 0;
     });
@@ -164,19 +168,25 @@ class TagRepositoryImpl implements TagRepository {
 
   @override
   Future<Map<String, int>> getTagStatistics() async {
-    final totalCount = await _database.select(_database.tags).get().then((rows) => rows.length);
-
-    final usedTagsCount = await (_database.select(_database.tags)
-        ..where((tag) => tag.usageCount.isBiggerThanValue(0)))
+    final totalCount = await _database
+        .select(_database.tags)
         .get()
         .then((rows) => rows.length);
+
+    final usedTagsCount =
+        await (_database.select(_database.tags)
+              ..where((tag) => tag.usageCount.isBiggerThanValue(0)))
+            .get()
+            .then((rows) => rows.length);
 
     final thisMonth = DateTime.now();
     final firstDayOfMonth = DateTime(thisMonth.year, thisMonth.month, 1);
-    final monthlyCreatedCount = await (_database.select(_database.tags)
-        ..where((tag) => tag.createdAt.isBiggerOrEqualValue(firstDayOfMonth)))
-        .get()
-        .then((rows) => rows.length);
+    final monthlyCreatedCount =
+        await (_database.select(_database.tags)..where(
+              (tag) => tag.createdAt.isBiggerOrEqualValue(firstDayOfMonth),
+            ))
+            .get()
+            .then((rows) => rows.length);
 
     return {
       'total': totalCount,
@@ -191,8 +201,9 @@ class TagRepositoryImpl implements TagRepository {
       ..where((tag) => tag.name.equals(name));
 
     if (excludeId != null) {
-      query = _database.select(_database.tags)
-        ..where((tag) => tag.name.equals(name) & tag.id.equals(excludeId).not());
+      query = _database.select(
+        _database.tags,
+      )..where((tag) => tag.name.equals(name) & tag.id.equals(excludeId).not());
     }
 
     final result = await query.getSingleOrNull();

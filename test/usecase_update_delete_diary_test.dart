@@ -20,21 +20,21 @@ void main() {
     final update = UpdateDiaryEntryUseCase(harness.diaryRepo, harness.tagRepo);
     final del = DeleteDiaryEntryUseCase(harness.diaryRepo, harness.tagRepo);
 
-    final res = await create.execute(CreateDiaryEntryParams(
-      title: '初始标题',
-      content: '内容A',
-      tagNames: ['标签A'],
-    ));
+    final res = await create.execute(
+      CreateDiaryEntryParams(title: '初始标题', content: '内容A', tagNames: ['标签A']),
+    );
     expect(res.isSuccess, isTrue);
     final id = res.dataOrThrow;
 
-    final upd = await update.execute(UpdateDiaryEntryParams(
-      id: id,
-      title: '更新标题',
-      content: '内容B',
-      tagNames: ['标签B'],
-      isFavorite: false,
-    ));
+    final upd = await update.execute(
+      UpdateDiaryEntryParams(
+        id: id,
+        title: '更新标题',
+        content: '内容B',
+        tagNames: ['标签B'],
+        isFavorite: false,
+      ),
+    );
     expect(upd.isSuccess, isTrue);
 
     final all = await harness.diaryRepo.getAllDiaryEntries().first;

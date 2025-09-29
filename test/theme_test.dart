@@ -12,11 +12,7 @@ void main() {
   });
 
   testWidgets('主题颜色与设计系统一致', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: InkboardApp(),
-      ),
-    );
+    await tester.pumpWidget(const ProviderScope(child: InkboardApp()));
 
     await tester.pump(const Duration(milliseconds: 400));
 

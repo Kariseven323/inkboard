@@ -14,11 +14,16 @@ class _RepoThrows implements DiaryEntryRepository {
   @override
   Stream<List<DiaryEntry>> getAllDiaryEntries() => Stream.value(const []);
   @override
-  Future<Map<String, int>> getDiaryStatistics() => Future<Map<String, int>>.error('X');
+  Future<Map<String, int>> getDiaryStatistics() =>
+      Future<Map<String, int>>.error('X');
   @override
-  Stream<List<DiaryEntry>> getDiaryEntriesByDateRange(DateTime startDate, DateTime endDate) => Stream.value(const []);
+  Stream<List<DiaryEntry>> getDiaryEntriesByDateRange(
+    DateTime startDate,
+    DateTime endDate,
+  ) => Stream.value(const []);
   @override
-  Stream<List<DiaryEntry>> getDiaryEntriesByTags(List<int> tagIds) => Stream.value(const []);
+  Stream<List<DiaryEntry>> getDiaryEntriesByTags(List<int> tagIds) =>
+      Stream.value(const []);
   @override
   Stream<List<DiaryEntry>> getFavoriteDiaryEntries() => Stream.value(const []);
   @override
@@ -28,7 +33,8 @@ class _RepoThrows implements DiaryEntryRepository {
   @override
   Future<bool> removeTagFromEntry(int entryId, int tagId) async => false;
   @override
-  Stream<List<DiaryEntry>> searchDiaryEntries(String query) => Stream.value(const []);
+  Stream<List<DiaryEntry>> searchDiaryEntries(String query) =>
+      Stream.value(const []);
   @override
   Future<bool> toggleFavorite(int id) async => false;
   @override
@@ -42,4 +48,3 @@ void main() {
     expect(r.isFailure, isTrue);
   });
 }
-

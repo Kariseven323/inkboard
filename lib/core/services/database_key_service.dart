@@ -16,4 +16,3 @@ abstract class DatabaseKeyService {
   /// 清空存储的密钥（登出或重置时使用）
   Future<void> clearKey();
 }
-

@@ -11,11 +11,7 @@ void main() {
   });
 
   testWidgets('FacebookLayout 顶部导航与图标存在', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: InkboardApp(),
-      ),
-    );
+    await tester.pumpWidget(const ProviderScope(child: InkboardApp()));
 
     await tester.pump(const Duration(milliseconds: 300));
 

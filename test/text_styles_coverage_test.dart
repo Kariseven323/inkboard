@@ -5,7 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:inkboard/core/theme/facebook_text_styles.dart';
 
 void main() {
-  testWidgets('覆盖 FacebookTextStyles 大部分样式 getter', (WidgetTester tester) async {
+  testWidgets('覆盖 FacebookTextStyles 大部分样式 getter', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       ScreenUtilInit(
         designSize: const Size(390, 844),
@@ -39,7 +41,10 @@ void main() {
 
     // 链接与衍生
     expect(FacebookTextStyles.link.fontSize, isNonZero);
-    expect(FacebookTextStyles.linkUnderline.decoration, TextDecoration.underline);
+    expect(
+      FacebookTextStyles.linkUnderline.decoration,
+      TextDecoration.underline,
+    );
 
     // 其他
     expect(FacebookTextStyles.error.color, isNotNull);
@@ -53,4 +58,3 @@ void main() {
     expect(textTheme.bodyMedium, isNotNull);
   });
 }
-

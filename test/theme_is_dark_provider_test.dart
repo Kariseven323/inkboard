@@ -9,10 +9,14 @@ void main() {
     // system: 取决于平台亮度，但应返回布尔
     expect(container.read(isDarkThemeProvider), isA<bool>());
     // 切换到 light/dark
-    await container.read(themeProvider.notifier).setThemeMode(AppThemeMode.light);
+    await container
+        .read(themeProvider.notifier)
+        .setThemeMode(AppThemeMode.light);
     await Future<void>.delayed(const Duration(milliseconds: 1));
     expect(container.read(isDarkThemeProvider), isFalse);
-    await container.read(themeProvider.notifier).setThemeMode(AppThemeMode.dark);
+    await container
+        .read(themeProvider.notifier)
+        .setThemeMode(AppThemeMode.dark);
     await Future<void>.delayed(const Duration(milliseconds: 1));
     expect(container.read(isDarkThemeProvider), isTrue);
   });

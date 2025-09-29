@@ -16,26 +16,36 @@ void main() {
       final now = DateTime.now();
       // 造一些数据
       final t1 = Tag(id: 1, name: '工作', color: '#1877F2', createdAt: now);
-      final t2 = Tag(id: 2, name: '学习', color: '#1877F2', createdAt: now, usageCount: 2);
+      final t2 = Tag(
+        id: 2,
+        name: '学习',
+        color: '#1877F2',
+        createdAt: now,
+        usageCount: 2,
+      );
 
       await tagRepo.createTag(t1);
       await tagRepo.createTag(t2);
 
-      await entryRepo.createDiaryEntry(DiaryEntry(
-        title: '今天的工作日志',
-        content: '完成了搜索功能，以及单元测试',
-        createdAt: now,
-        updatedAt: now,
-        tags: [t1],
-      ));
-      await entryRepo.createDiaryEntry(DiaryEntry(
-        title: 'Flutter 学习笔记',
-        content: '测试与覆盖率统计',
-        createdAt: now,
-        updatedAt: now,
-        isFavorite: true,
-        tags: [t2],
-      ));
+      await entryRepo.createDiaryEntry(
+        DiaryEntry(
+          title: '今天的工作日志',
+          content: '完成了搜索功能，以及单元测试',
+          createdAt: now,
+          updatedAt: now,
+          tags: [t1],
+        ),
+      );
+      await entryRepo.createDiaryEntry(
+        DiaryEntry(
+          title: 'Flutter 学习笔记',
+          content: '测试与覆盖率统计',
+          createdAt: now,
+          updatedAt: now,
+          isFavorite: true,
+          tags: [t2],
+        ),
+      );
 
       // globalSearch（排序、片段）
       final results = await search.globalSearch('学习');
@@ -96,26 +106,37 @@ void main() {
       await entryRepo.createDiaryEntry(e2);
 
       // 标题过滤
-      final byTitle = await search.advancedSearchDiaryEntries(titleQuery: '工作').first;
+      final byTitle = await search
+          .advancedSearchDiaryEntries(titleQuery: '工作')
+          .first;
       expect(byTitle.length, 1);
       // 内容过滤
-      final byContent = await search.advancedSearchDiaryEntries(contentQuery: '摄影').first;
+      final byContent = await search
+          .advancedSearchDiaryEntries(contentQuery: '摄影')
+          .first;
       expect(byContent.length, 1);
       // 标签过滤
-      final byTag = await search.advancedSearchDiaryEntries(tagIds: const [1]).first;
+      final byTag = await search
+          .advancedSearchDiaryEntries(tagIds: const [1])
+          .first;
       expect(byTag.length, 1);
       // 日期范围过滤
       final byDate = await search
-          .advancedSearchDiaryEntries(startDate: now.subtract(const Duration(days: 1)))
+          .advancedSearchDiaryEntries(
+            startDate: now.subtract(const Duration(days: 1)),
+          )
           .first;
       expect(byDate.any((e) => e.title == '周末生活'), true);
       // 收藏过滤
-      final byFav = await search.advancedSearchDiaryEntries(isFavorite: true).first;
+      final byFav = await search
+          .advancedSearchDiaryEntries(isFavorite: true)
+          .first;
       expect(byFav.any((e) => e.title == '工作日报'), true);
       // 心情过滤
-      final byMood = await search.advancedSearchDiaryEntries(moodScore: 3).first;
+      final byMood = await search
+          .advancedSearchDiaryEntries(moodScore: 3)
+          .first;
       expect(byMood.any((e) => e.title == '周末生活'), true);
     });
   });
 }
-

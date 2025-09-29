@@ -20,11 +20,7 @@ void main() {
       tester.view.resetDevicePixelRatio();
     });
 
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: InkboardApp(),
-      ),
-    );
+    await tester.pumpWidget(const ProviderScope(child: InkboardApp()));
     await tester.pump(const Duration(milliseconds: 300));
   }
 

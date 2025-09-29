@@ -26,16 +26,18 @@ void main() {
     cfg.init(); // should not throw
   });
 
-  test('DatabaseKeyService.generateKey returns base64 32 bytes; getOrCreate consistent', () async {
-    final svc = _MemoryKeyService();
-    final key = svc.generateKey();
-    expect(base64.decode(key).length, 32);
-    final k1 = await svc.getOrCreateKey();
-    final k2 = await svc.getOrCreateKey();
-    expect(k1, k2);
-    await svc.clearKey();
-    final k3 = await svc.getOrCreateKey();
-    expect(k3 != k1, true);
-  });
+  test(
+    'DatabaseKeyService.generateKey returns base64 32 bytes; getOrCreate consistent',
+    () async {
+      final svc = _MemoryKeyService();
+      final key = svc.generateKey();
+      expect(base64.decode(key).length, 32);
+      final k1 = await svc.getOrCreateKey();
+      final k2 = await svc.getOrCreateKey();
+      expect(k1, k2);
+      await svc.clearKey();
+      final k3 = await svc.getOrCreateKey();
+      expect(k3 != k1, true);
+    },
+  );
 }
-

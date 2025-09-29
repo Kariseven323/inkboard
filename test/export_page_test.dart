@@ -11,25 +11,28 @@ import 'package:inkboard/presentation/pages/export_page.dart';
 
 import 'fakes.dart';
 
-class _RepoAdapter extends InMemoryDiaryEntryRepository implements DiaryEntryRepository {}
+class _RepoAdapter extends InMemoryDiaryEntryRepository
+    implements DiaryEntryRepository {}
 
 void main() {
   setUp(() async {
     await getIt.reset();
     final repo = _RepoAdapter();
     final now = DateTime.now();
-    await repo.createDiaryEntry(DiaryEntry(
-      id: 1,
-      title: '标题1',
-      content: '内容1',
-      createdAt: now,
-      updatedAt: now,
-      isFavorite: true,
-      tags: [Tag(id: 1, name: '工作', color: '#1877F2', createdAt: now)],
-      location: '深圳',
-      weather: '晴',
-      moodScore: 5,
-    ));
+    await repo.createDiaryEntry(
+      DiaryEntry(
+        id: 1,
+        title: '标题1',
+        content: '内容1',
+        createdAt: now,
+        updatedAt: now,
+        isFavorite: true,
+        tags: [Tag(id: 1, name: '工作', color: '#1877F2', createdAt: now)],
+        location: '深圳',
+        weather: '晴',
+        moodScore: 5,
+      ),
+    );
     getIt.registerSingleton<DiaryEntryRepository>(repo);
   });
 

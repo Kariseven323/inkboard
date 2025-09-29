@@ -14,10 +14,7 @@ import '../../domain/usecases/update_delete_diary_entry_usecase.dart';
 class DiaryEditPage extends ConsumerStatefulWidget {
   final DiaryEntry? diaryEntry; // 如果为null则是创建模式，否则是编辑模式
 
-  const DiaryEditPage({
-    super.key,
-    this.diaryEntry,
-  });
+  const DiaryEditPage({super.key, this.diaryEntry});
 
   @override
   ConsumerState<DiaryEditPage> createState() => _DiaryEditPageState();
@@ -261,7 +258,8 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
                     ButtonSegment(value: true, label: Text('预览')),
                   ],
                   selected: {_previewOnlyOnNarrow},
-                  onSelectionChanged: (s) => setState(() => _previewOnlyOnNarrow = s.first),
+                  onSelectionChanged: (s) =>
+                      setState(() => _previewOnlyOnNarrow = s.first),
                 ),
               ),
             ),
@@ -308,7 +306,8 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
               expands: true,
               textAlignVertical: TextAlignVertical.top,
               decoration: InputDecoration(
-                hintText: '写下你想记录的内容...\n\n支持Markdown格式：\n# 标题\n**粗体**\n*斜体*\n- 列表项',
+                hintText:
+                    '写下你想记录的内容...\n\n支持Markdown格式：\n# 标题\n**粗体**\n*斜体*\n- 列表项',
                 hintStyle: FacebookTextStyles.bodyMedium.copyWith(
                   color: FacebookColors.textSecondary,
                   height: 1.5,
@@ -460,7 +459,9 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
     final block = text.substring(lineStart, effectiveEnd);
     final updated = block
         .split('\n')
-        .map((l) => l.trim().isEmpty ? l : (l.startsWith(prefix) ? l : prefix + l))
+        .map(
+          (l) => l.trim().isEmpty ? l : (l.startsWith(prefix) ? l : prefix + l),
+        )
         .join('\n');
 
     final newText = text.replaceRange(lineStart, effectiveEnd, updated);
@@ -476,12 +477,7 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
       padding: FacebookSizes.paddingAll,
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(
-          top: BorderSide(
-            color: FacebookColors.border,
-            width: 1,
-          ),
-        ),
+        border: Border(top: BorderSide(color: FacebookColors.border, width: 1)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -566,14 +562,18 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
           children: [
             Icon(
               isSelected ? Icons.favorite : icon,
-              color: isSelected ? FacebookColors.error : FacebookColors.iconGray,
+              color: isSelected
+                  ? FacebookColors.error
+                  : FacebookColors.iconGray,
               size: FacebookSizes.iconSmall,
             ),
             SizedBox(width: FacebookSizes.spacing4),
             Text(
               label,
               style: FacebookTextStyles.bodySmall.copyWith(
-                color: isSelected ? FacebookColors.primary : FacebookColors.textSecondary,
+                color: isSelected
+                    ? FacebookColors.primary
+                    : FacebookColors.textSecondary,
                 fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
               ),
             ),
@@ -617,18 +617,25 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
   /// 获取心情表情
   String _getMoodEmoji(int score) {
     switch (score) {
-      case 1: return '😢';
-      case 2: return '😕';
-      case 3: return '😐';
-      case 4: return '😊';
-      case 5: return '😄';
-      default: return '😐';
+      case 1:
+        return '😢';
+      case 2:
+        return '😕';
+      case 3:
+        return '😐';
+      case 4:
+        return '😊';
+      case 5:
+        return '😄';
+      default:
+        return '😐';
     }
   }
 
   /// 处理返回按钮
   void _handleBackPressed() {
-    if (_titleController.text.isNotEmpty || _contentController.text.isNotEmpty) {
+    if (_titleController.text.isNotEmpty ||
+        _contentController.text.isNotEmpty) {
       HapticFeedback.selectionClick();
       showDialog(
         context: context,
@@ -646,10 +653,7 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
-              child: Text(
-                '放弃',
-                style: TextStyle(color: FacebookColors.error),
-              ),
+              child: Text('放弃', style: TextStyle(color: FacebookColors.error)),
             ),
           ],
         ),

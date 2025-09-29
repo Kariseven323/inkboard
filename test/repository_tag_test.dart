@@ -15,16 +15,16 @@ void main() {
   });
 
   test('tag CRUD and queries', () async {
-    final id = await harness.tagRepo.createTag(Tag(
-      name: '编程',
-      color: '#2196F3',
-      createdAt: DateTime.now(),
-    ));
+    final id = await harness.tagRepo.createTag(
+      Tag(name: '编程', color: '#2196F3', createdAt: DateTime.now()),
+    );
 
     final fetched = await harness.tagRepo.getTagById(id);
     expect(fetched?.name, '编程');
 
-    final updated = await harness.tagRepo.updateTag(fetched!.copyWith(color: '#000000'));
+    final updated = await harness.tagRepo.updateTag(
+      fetched!.copyWith(color: '#000000'),
+    );
     expect(updated, isTrue);
 
     final exists = await harness.tagRepo.isTagNameExists('编程');

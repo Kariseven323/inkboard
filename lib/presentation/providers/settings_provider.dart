@@ -29,4 +29,3 @@ class TextScaleNotifier extends StateNotifier<double> {
 final textScaleProvider = StateNotifierProvider<TextScaleNotifier, double>(
   (ref) => TextScaleNotifier(),
 );
-

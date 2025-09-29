@@ -6,7 +6,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:inkboard/presentation/pages/diary_edit_page.dart';
 
 void main() {
-  Future<void> pumpEditor(WidgetTester tester, {Size size = const Size(390, 800)}) async {
+  Future<void> pumpEditor(
+    WidgetTester tester, {
+    Size size = const Size(390, 800),
+  }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
@@ -51,4 +54,3 @@ void main() {
     expect(find.byType(DiaryEditPage), findsNothing);
   });
 }
-

@@ -59,11 +59,11 @@ class Tag extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        color,
-        createdAt,
-        usageCount,
-        description,
-      ];
+    id,
+    name,
+    color,
+    createdAt,
+    usageCount,
+    description,
+  ];
 }

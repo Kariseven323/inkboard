@@ -21,8 +21,12 @@ void main() {
 
   test('DiaryEntryRepositoryImpl full flows', () async {
     // 准备标签
-    final tagId1 = await db.into(db.tags).insert(TagsCompanion.insert(name: 'T1', createdAt: DateTime.now()));
-    final tagId2 = await db.into(db.tags).insert(TagsCompanion.insert(name: 'T2', createdAt: DateTime.now()));
+    final tagId1 = await db
+        .into(db.tags)
+        .insert(TagsCompanion.insert(name: 'T1', createdAt: DateTime.now()));
+    final tagId2 = await db
+        .into(db.tags)
+        .insert(TagsCompanion.insert(name: 'T2', createdAt: DateTime.now()));
 
     final now = DateTime.now();
     final entry = DiaryEntry(
@@ -45,7 +49,12 @@ void main() {
     expect(byTags.length, 1);
 
     // 日期范围筛选
-    final byDate = await repo.getDiaryEntriesByDateRange(now.subtract(const Duration(days: 1)), now.add(const Duration(days: 1))).first;
+    final byDate = await repo
+        .getDiaryEntriesByDateRange(
+          now.subtract(const Duration(days: 1)),
+          now.add(const Duration(days: 1)),
+        )
+        .first;
     expect(byDate.length, greaterThanOrEqualTo(1));
 
     // FTS 不存在时，search fallback 到标题/内容匹配
@@ -61,7 +70,13 @@ void main() {
     expect(remOk, isTrue);
 
     // update（日记 + 标签全量替换）
-    final updated = await repo.updateDiaryEntry(entry.copyWith(id: id, title: '标题B', tags: [Tag(id: tagId2, name: 'T2', color: '#FF9800', createdAt: now)]));
+    final updated = await repo.updateDiaryEntry(
+      entry.copyWith(
+        id: id,
+        title: '标题B',
+        tags: [Tag(id: tagId2, name: 'T2', color: '#FF9800', createdAt: now)],
+      ),
+    );
     expect(updated, isTrue);
     final got2 = await repo.getDiaryEntryById(id);
     expect(got2!.title, '标题B');

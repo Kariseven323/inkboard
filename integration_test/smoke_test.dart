@@ -9,11 +9,7 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('应用可以启动并显示关键信息', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: InkboardApp(),
-      ),
-    );
+    await tester.pumpWidget(const ProviderScope(child: InkboardApp()));
 
     await tester.pumpAndSettle();
 
@@ -25,4 +21,3 @@ void main() {
     expect(find.byType(AppBar), findsOneWidget);
   });
 }
-

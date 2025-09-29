@@ -59,7 +59,9 @@ class SearchDiaryUseCase {
   /// 获取搜索建议
   Future<Result<List<String>>> getSearchSuggestions(String query) async {
     try {
-      final suggestions = await _searchService.getSearchSuggestions(query.trim());
+      final suggestions = await _searchService.getSearchSuggestions(
+        query.trim(),
+      );
       return Result.success(suggestions);
     } catch (e) {
       return Result.failure('获取搜索建议失败: $e');

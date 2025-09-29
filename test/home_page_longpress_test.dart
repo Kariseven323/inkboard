@@ -19,7 +19,9 @@ void main() {
       updatedAt: now,
       tags: [Tag(id: 1, name: '工作', color: '#1877F2', createdAt: now)],
     );
-    final override = diaryEntriesProvider.overrideWith((ref) => Stream.value([entry]));
+    final override = diaryEntriesProvider.overrideWith(
+      (ref) => Stream.value([entry]),
+    );
 
     tester.view.devicePixelRatio = 1.0;
     tester.view.physicalSize = const Size(390, 844);
@@ -33,7 +35,8 @@ void main() {
         overrides: [override],
         child: ScreenUtilInit(
           designSize: const Size(390, 844),
-          builder: (context, _) => const MaterialApp(home: Scaffold(body: HomePage())),
+          builder: (context, _) =>
+              const MaterialApp(home: Scaffold(body: HomePage())),
         ),
       ),
     );
@@ -57,7 +60,9 @@ void main() {
       updatedAt: now,
       tags: const [],
     );
-    final override = diaryEntriesProvider.overrideWith((ref) => Stream.value([entry]));
+    final override = diaryEntriesProvider.overrideWith(
+      (ref) => Stream.value([entry]),
+    );
 
     tester.view.devicePixelRatio = 1.0;
     tester.view.physicalSize = const Size(390, 844);
@@ -71,7 +76,8 @@ void main() {
         overrides: [override],
         child: ScreenUtilInit(
           designSize: const Size(390, 844),
-          builder: (context, _) => const MaterialApp(home: Scaffold(body: HomePage())),
+          builder: (context, _) =>
+              const MaterialApp(home: Scaffold(body: HomePage())),
         ),
       ),
     );

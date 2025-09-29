@@ -27,7 +27,10 @@ class GetDiaryEntriesUseCase {
   }
 
   /// 根据日期范围获取日记条目
-  Stream<List<DiaryEntry>> getEntriesByDateRange(DateTime startDate, DateTime endDate) {
+  Stream<List<DiaryEntry>> getEntriesByDateRange(
+    DateTime startDate,
+    DateTime endDate,
+  ) {
     return _diaryEntryRepository.getDiaryEntriesByDateRange(startDate, endDate);
   }
 

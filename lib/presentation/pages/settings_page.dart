@@ -36,9 +36,18 @@ class SettingsPage extends ConsumerWidget {
                 subtitle: Text(_displayTheme(themeMode)),
                 trailing: SegmentedButton<AppThemeMode>(
                   segments: const [
-                    ButtonSegment(value: AppThemeMode.system, icon: Icon(Icons.brightness_auto)),
-                    ButtonSegment(value: AppThemeMode.light, icon: Icon(Icons.light_mode)),
-                    ButtonSegment(value: AppThemeMode.dark, icon: Icon(Icons.dark_mode)),
+                    ButtonSegment(
+                      value: AppThemeMode.system,
+                      icon: Icon(Icons.brightness_auto),
+                    ),
+                    ButtonSegment(
+                      value: AppThemeMode.light,
+                      icon: Icon(Icons.light_mode),
+                    ),
+                    ButtonSegment(
+                      value: AppThemeMode.dark,
+                      icon: Icon(Icons.dark_mode),
+                    ),
                   ],
                   selected: {themeMode},
                   onSelectionChanged: (s) {
@@ -85,9 +94,9 @@ class SettingsPage extends ConsumerWidget {
                 subtitle: const Text('导出为Markdown或JSON'),
                 onTap: () {
                   HapticFeedback.selectionClick();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const ExportPage()),
-                  );
+                  Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute(builder: (_) => const ExportPage()));
                 },
               ),
             ],

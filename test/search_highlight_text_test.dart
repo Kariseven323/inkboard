@@ -14,15 +14,46 @@ class _Svc implements SearchService {
   @override
   Future<List<SearchResult>> globalSearch(String query) async {
     final now = DateTime.now();
-    final entry = DiaryEntry(id: 1, title: 't', content: 'c', createdAt: now, updatedAt: now, tags: [Tag(id: 1, name: '标签', color: '#1877F2', createdAt: now)]);
-    return [SearchResult(type: SearchResultType.diaryEntry, data: entry, snippet: '命中 **ABC** 片段')];
+    final entry = DiaryEntry(
+      id: 1,
+      title: 't',
+      content: 'c',
+      createdAt: now,
+      updatedAt: now,
+      tags: [Tag(id: 1, name: '标签', color: '#1877F2', createdAt: now)],
+    );
+    return [
+      SearchResult(
+        type: SearchResultType.diaryEntry,
+        data: entry,
+        snippet: '命中 **ABC** 片段',
+      ),
+    ];
   }
+
   @override
-  Stream<List<DiaryEntry>> searchDiaryEntries(String query) async* { yield const []; }
+  Stream<List<DiaryEntry>> searchDiaryEntries(String query) async* {
+    yield const [];
+  }
+
   @override
-  Stream<List<Tag>> searchTags(String query) async* { yield const []; }
+  Stream<List<Tag>> searchTags(String query) async* {
+    yield const [];
+  }
+
   @override
-  Stream<List<DiaryEntry>> advancedSearchDiaryEntries({String? titleQuery, String? contentQuery, List<int>? tagIds, DateTime? startDate, DateTime? endDate, bool? isFavorite, int? moodScore}) async* { yield const []; }
+  Stream<List<DiaryEntry>> advancedSearchDiaryEntries({
+    String? titleQuery,
+    String? contentQuery,
+    List<int>? tagIds,
+    DateTime? startDate,
+    DateTime? endDate,
+    bool? isFavorite,
+    int? moodScore,
+  }) async* {
+    yield const [];
+  }
+
   @override
   Future<List<String>> getSearchSuggestions(String query) async => [];
   @override
@@ -44,7 +75,8 @@ void main() {
       ProviderScope(
         child: ScreenUtilInit(
           designSize: const Size(390, 844),
-          builder: (context, _) => const MaterialApp(home: SearchPage(initialQuery: 'ABC')),
+          builder: (context, _) =>
+              const MaterialApp(home: SearchPage(initialQuery: 'ABC')),
         ),
       ),
     );
@@ -56,7 +88,9 @@ void main() {
     for (final e in richTexts.evaluate()) {
       final w = e.widget as RichText;
       final span = w.text;
-      if (span is TextSpan && (span.toPlainText().contains('命中') || span.toPlainText().contains('片段'))) {
+      if (span is TextSpan &&
+          (span.toPlainText().contains('命中') ||
+              span.toPlainText().contains('片段'))) {
         final children = span.children ?? const [];
         for (final c in children) {
           if (c is TextSpan && (c.text?.contains('ABC') ?? false)) {
@@ -71,4 +105,3 @@ void main() {
     expect(hasBold, isTrue);
   });
 }
-

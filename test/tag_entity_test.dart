@@ -25,8 +25,20 @@ void main() {
 
   test('Tag 等价性与哈希', () {
     final now = DateTime.now();
-    final a = Tag(id: 1, name: 'X', color: '#000', createdAt: now, usageCount: 2);
-    final b = Tag(id: 1, name: 'X', color: '#000', createdAt: now, usageCount: 2);
+    final a = Tag(
+      id: 1,
+      name: 'X',
+      color: '#000',
+      createdAt: now,
+      usageCount: 2,
+    );
+    final b = Tag(
+      id: 1,
+      name: 'X',
+      color: '#000',
+      createdAt: now,
+      usageCount: 2,
+    );
     final c = Tag(id: 2, name: 'Y', color: '#111', createdAt: now);
     expect(a, equals(b));
     expect(a.hashCode, equals(b.hashCode));

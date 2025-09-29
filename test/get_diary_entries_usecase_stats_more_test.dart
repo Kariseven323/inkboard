@@ -16,4 +16,3 @@ void main() {
     expect(s.getAverageMonthlyEntries(0), 0.0);
   });
 }
-

@@ -24,26 +24,28 @@ final diaryStatisticsProvider = FutureProvider((ref) async {
 });
 
 /// 根据标签筛选的日记列表状态管理
-final diaryEntriesByTagsProvider = StreamProvider.family<List<DiaryEntry>, List<int>>((ref, tagIds) {
-  final getDiaryEntriesUseCase = getIt<GetDiaryEntriesUseCase>();
-  return getDiaryEntriesUseCase.getEntriesByTags(tagIds);
-});
+final diaryEntriesByTagsProvider =
+    StreamProvider.family<List<DiaryEntry>, List<int>>((ref, tagIds) {
+      final getDiaryEntriesUseCase = getIt<GetDiaryEntriesUseCase>();
+      return getDiaryEntriesUseCase.getEntriesByTags(tagIds);
+    });
 
 /// 根据日期范围筛选的日记列表状态管理
-final diaryEntriesByDateRangeProvider = StreamProvider.family<List<DiaryEntry>, DateRange>((ref, dateRange) {
-  final getDiaryEntriesUseCase = getIt<GetDiaryEntriesUseCase>();
-  return getDiaryEntriesUseCase.getEntriesByDateRange(dateRange.startDate, dateRange.endDate);
-});
+final diaryEntriesByDateRangeProvider =
+    StreamProvider.family<List<DiaryEntry>, DateRange>((ref, dateRange) {
+      final getDiaryEntriesUseCase = getIt<GetDiaryEntriesUseCase>();
+      return getDiaryEntriesUseCase.getEntriesByDateRange(
+        dateRange.startDate,
+        dateRange.endDate,
+      );
+    });
 
 /// 日期范围辅助类
 class DateRange {
   final DateTime startDate;
   final DateTime endDate;
 
-  DateRange({
-    required this.startDate,
-    required this.endDate,
-  });
+  DateRange({required this.startDate, required this.endDate});
 
   @override
   bool operator ==(Object other) =>

@@ -50,8 +50,16 @@ class InMemoryDiaryEntryRepository implements DiaryEntryRepository {
   }
 
   @override
-  Stream<List<DiaryEntry>> getDiaryEntriesByDateRange(DateTime startDate, DateTime endDate) async* {
-    yield _entries.where((e) => !e.createdAt.isBefore(startDate) && !e.createdAt.isAfter(endDate)).toList();
+  Stream<List<DiaryEntry>> getDiaryEntriesByDateRange(
+    DateTime startDate,
+    DateTime endDate,
+  ) async* {
+    yield _entries
+        .where(
+          (e) =>
+              !e.createdAt.isBefore(startDate) && !e.createdAt.isAfter(endDate),
+        )
+        .toList();
   }
 
   @override
@@ -59,10 +67,14 @@ class InMemoryDiaryEntryRepository implements DiaryEntryRepository {
     // 调试：打印当前条目与传入tagIds
     assert(() {
       // ignore: avoid_print
-      print('[InMemory] getDiaryEntriesByTags ids=$tagIds entries=${_entries.length}');
+      print(
+        '[InMemory] getDiaryEntriesByTags ids=$tagIds entries=${_entries.length}',
+      );
       return true;
     }());
-    yield _entries.where((e) => e.tags.any((t) => t.id != null && tagIds.contains(t.id))).toList();
+    yield _entries
+        .where((e) => e.tags.any((t) => t.id != null && tagIds.contains(t.id)))
+        .toList();
   }
 
   @override
@@ -73,7 +85,13 @@ class InMemoryDiaryEntryRepository implements DiaryEntryRepository {
   @override
   Stream<List<DiaryEntry>> searchDiaryEntries(String query) async* {
     final q = query.toLowerCase();
-    yield _entries.where((e) => e.title.toLowerCase().contains(q) || e.content.toLowerCase().contains(q)).toList();
+    yield _entries
+        .where(
+          (e) =>
+              e.title.toLowerCase().contains(q) ||
+              e.content.toLowerCase().contains(q),
+        )
+        .toList();
   }
 
   @override
@@ -90,7 +108,11 @@ class InMemoryDiaryEntryRepository implements DiaryEntryRepository {
     final favorites = _entries.where((e) => e.isFavorite).length;
     // 简化：最近30天内创建的视为本月
     final now = DateTime.now();
-    final monthly = _entries.where((e) => e.createdAt.isAfter(now.subtract(const Duration(days: 30)))).length;
+    final monthly = _entries
+        .where(
+          (e) => e.createdAt.isAfter(now.subtract(const Duration(days: 30))),
+        )
+        .length;
     return {'total': total, 'favorites': favorites, 'monthly': monthly};
   }
 
@@ -99,7 +121,10 @@ class InMemoryDiaryEntryRepository implements DiaryEntryRepository {
     final idx = _entries.indexWhere((e) => e.id == id);
     if (idx == -1) return false;
     final e = _entries[idx];
-    _entries[idx] = e.copyWith(isFavorite: !e.isFavorite, updatedAt: DateTime.now());
+    _entries[idx] = e.copyWith(
+      isFavorite: !e.isFavorite,
+      updatedAt: DateTime.now(),
+    );
     return true;
   }
 
@@ -109,7 +134,17 @@ class InMemoryDiaryEntryRepository implements DiaryEntryRepository {
     if (idx == -1) return false;
     final e = _entries[idx];
     if (e.tags.any((t) => t.id == tagId)) return true;
-    _entries[idx] = e.copyWith(tags: [...e.tags, Tag(id: tagId, name: 'T$tagId', color: '#1877F2', createdAt: DateTime.now())]);
+    _entries[idx] = e.copyWith(
+      tags: [
+        ...e.tags,
+        Tag(
+          id: tagId,
+          name: 'T$tagId',
+          color: '#1877F2',
+          createdAt: DateTime.now(),
+        ),
+      ],
+    );
     return true;
   }
 
@@ -118,14 +153,17 @@ class InMemoryDiaryEntryRepository implements DiaryEntryRepository {
     final idx = _entries.indexWhere((e) => e.id == entryId);
     if (idx == -1) return false;
     final e = _entries[idx];
-    _entries[idx] = e.copyWith(tags: e.tags.where((t) => t.id != tagId).toList());
+    _entries[idx] = e.copyWith(
+      tags: e.tags.where((t) => t.id != tagId).toList(),
+    );
     return true;
   }
 }
 
 class InMemoryTagRepository implements TagRepository {
   final List<Tag> _tags = [];
-  final StreamController<List<Tag>> _tagsController = StreamController<List<Tag>>.broadcast();
+  final StreamController<List<Tag>> _tagsController =
+      StreamController<List<Tag>>.broadcast();
   int _id = 1;
 
   void _emit() {
@@ -158,10 +196,12 @@ class InMemoryTagRepository implements TagRepository {
   }
 
   @override
-  Future<Tag?> getTagById(int id) async => _tags.where((t) => t.id == id).cast<Tag?>().firstOrNull;
+  Future<Tag?> getTagById(int id) async =>
+      _tags.where((t) => t.id == id).cast<Tag?>().firstOrNull;
 
   @override
-  Future<Tag?> getTagByName(String name) async => _tags.where((t) => t.name == name).cast<Tag?>().firstOrNull;
+  Future<Tag?> getTagByName(String name) async =>
+      _tags.where((t) => t.name == name).cast<Tag?>().firstOrNull;
 
   @override
   Future<bool> incrementTagUsage(int tagId) async {
@@ -203,27 +243,33 @@ class InMemoryTagRepository implements TagRepository {
     yield List.unmodifiable(_tags);
     yield* _tagsController.stream;
   }
+
   @override
   Stream<List<Tag>> getPopularTags({int limit = 10}) {
     return getAllTags().map((list) {
-      final copy = list.toList()..sort((a,b)=>b.usageCount.compareTo(a.usageCount));
+      final copy = list.toList()
+        ..sort((a, b) => b.usageCount.compareTo(a.usageCount));
       return copy.take(limit).toList();
     });
   }
+
   @override
   Stream<List<Tag>> getRecentTags({int limit = 5}) {
     return getAllTags().map((list) => list.reversed.take(limit).toList());
   }
+
   @override
   Stream<List<Tag>> searchTags(String query) {
-    return getAllTags().map((list) => list.where((t)=>t.name.contains(query)).toList());
+    return getAllTags().map(
+      (list) => list.where((t) => t.name.contains(query)).toList(),
+    );
   }
 
   @override
   Future<bool> updateTag(Tag tag) async {
-    final idx = _tags.indexWhere((t)=>t.id==tag.id);
-    if (idx==-1) return false; 
-    _tags[idx]=tag; 
+    final idx = _tags.indexWhere((t) => t.id == tag.id);
+    if (idx == -1) return false;
+    _tags[idx] = tag;
     _emit();
     return true;
   }
@@ -231,20 +277,20 @@ class InMemoryTagRepository implements TagRepository {
   @override
   Future<bool> deleteTags(List<int> ids) async {
     final before = _tags.length;
-    _tags.removeWhere((t)=>ids.contains(t.id));
+    _tags.removeWhere((t) => ids.contains(t.id));
     _emit();
     return _tags.length < before;
   }
 
   @override
   Future<Map<String, int>> getTagStatistics() async => {
-        'total': _tags.length,
-        'popular': _tags.where((t) => t.usageCount > 0).length,
-      };
+    'total': _tags.length,
+    'popular': _tags.where((t) => t.usageCount > 0).length,
+  };
 
   @override
-  Future<bool> isTagNameExists(String name, {int? excludeId}) async =>
-      _tags.any((t) => t.name == name && (excludeId == null || t.id != excludeId));
+  Future<bool> isTagNameExists(String name, {int? excludeId}) async => _tags
+      .any((t) => t.name == name && (excludeId == null || t.id != excludeId));
 }
 
 extension _FirstOrNull<E> on Iterable<E> {

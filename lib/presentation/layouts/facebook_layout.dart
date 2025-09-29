@@ -27,8 +27,9 @@ class FacebookLayout extends StatelessWidget {
 
     // 响应式断点判断
     final bool isMobile = screenWidth < FacebookSizes.breakpointTablet;
-    final bool isTablet = screenWidth >= FacebookSizes.breakpointTablet &&
-                         screenWidth < FacebookSizes.breakpointDesktop;
+    final bool isTablet =
+        screenWidth >= FacebookSizes.breakpointTablet &&
+        screenWidth < FacebookSizes.breakpointDesktop;
     final bool isDesktop = screenWidth >= FacebookSizes.breakpointDesktop;
 
     return Scaffold(
@@ -74,21 +75,25 @@ class FacebookLayout extends StatelessWidget {
           SizedBox(width: FacebookSizes.spacing12),
 
           // 搜索框（提取为可悬停/聚焦的组件）
-          const Expanded(
-            child: _NavSearchField(),
-          ),
+          const Expanded(child: _NavSearchField()),
         ],
       ),
       actions: [
         // 右侧图标按钮（36px圆形，悬停#F0F2F5）
-        _fbIconButton(Icons.home_outlined, () {}, key: const Key('nav_icon_home')),
-        _fbIconButton(Icons.notifications_outlined, () {}, key: const Key('nav_icon_notifications')),
+        _fbIconButton(
+          Icons.home_outlined,
+          () {},
+          key: const Key('nav_icon_home'),
+        ),
+        _fbIconButton(
+          Icons.notifications_outlined,
+          () {},
+          key: const Key('nav_icon_notifications'),
+        ),
         _fbIconButton(Icons.settings_outlined, () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const SettingsPage(),
-            ),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const SettingsPage()));
         }, key: const Key('nav_icon_settings')),
         SizedBox(width: FacebookSizes.spacing8),
 
@@ -113,7 +118,12 @@ class FacebookLayout extends StatelessWidget {
   }
 
   /// 构建主体布局
-  Widget _buildBody(BuildContext context, bool isMobile, bool isTablet, bool isDesktop) {
+  Widget _buildBody(
+    BuildContext context,
+    bool isMobile,
+    bool isTablet,
+    bool isDesktop,
+  ) {
     if (isMobile) {
       // 移动端：仅显示主内容
       return _buildMainContent();

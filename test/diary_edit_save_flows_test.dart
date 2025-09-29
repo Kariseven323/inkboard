@@ -12,10 +12,17 @@ import 'package:inkboard/presentation/pages/diary_edit_page.dart';
 
 import 'fakes.dart';
 
-Future<void> _pumpEditor(WidgetTester tester, Widget child, {Size size = const Size(390, 800)}) async {
+Future<void> _pumpEditor(
+  WidgetTester tester,
+  Widget child, {
+  Size size = const Size(390, 800),
+}) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1.0;
-  addTearDown(() { tester.view.resetPhysicalSize(); tester.view.resetDevicePixelRatio(); });
+  addTearDown(() {
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
+  });
   await tester.pumpWidget(
     ProviderScope(
       child: ScreenUtilInit(
@@ -25,7 +32,9 @@ Future<void> _pumpEditor(WidgetTester tester, Widget child, {Size size = const S
             builder: (ctx) {
               // 将编辑页以 push 的方式入栈，便于测试中验证 pop 返回
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                Navigator.of(ctx).push(MaterialPageRoute(builder: (_) => child));
+                Navigator.of(
+                  ctx,
+                ).push(MaterialPageRoute(builder: (_) => child));
               });
               return const SizedBox.shrink();
             },
@@ -42,20 +51,30 @@ void main() {
     await getIt.reset();
     final entryRepo = InMemoryDiaryEntryRepository();
     final tagRepo = InMemoryTagRepository();
-    getIt.registerSingleton<CreateDiaryEntryUseCase>(CreateDiaryEntryUseCase(entryRepo, tagRepo));
-    getIt.registerSingleton<UpdateDiaryEntryUseCase>(UpdateDiaryEntryUseCase(entryRepo, tagRepo));
+    getIt.registerSingleton<CreateDiaryEntryUseCase>(
+      CreateDiaryEntryUseCase(entryRepo, tagRepo),
+    );
+    getIt.registerSingleton<UpdateDiaryEntryUseCase>(
+      UpdateDiaryEntryUseCase(entryRepo, tagRepo),
+    );
 
     await _pumpEditor(tester, const DiaryEditPage());
 
     final pageFinder = find.byType(DiaryEditPage);
-    final titleField = find.descendant(of: pageFinder, matching: find.byType(TextFormField)).first;
-    final contentField = find.descendant(of: pageFinder, matching: find.byType(TextFormField)).last;
+    final titleField = find
+        .descendant(of: pageFinder, matching: find.byType(TextFormField))
+        .first;
+    final contentField = find
+        .descendant(of: pageFinder, matching: find.byType(TextFormField))
+        .last;
     await tester.enterText(titleField, '标题X');
     await tester.enterText(contentField, '内容Y');
     await tester.pump(const Duration(milliseconds: 100));
 
     // 点击 AppBar 右侧“发布”按钮
-    final publishBtn = find.ancestor(of: find.text('发布'), matching: find.byType(TextButton)).first;
+    final publishBtn = find
+        .ancestor(of: find.text('发布'), matching: find.byType(TextButton))
+        .first;
     await tester.ensureVisible(publishBtn);
     await tester.tap(publishBtn);
     await tester.pump(const Duration(milliseconds: 300));
@@ -69,19 +88,42 @@ void main() {
     final entryRepo = InMemoryDiaryEntryRepository();
     final tagRepo = InMemoryTagRepository();
     final now = DateTime.now();
-    final entry = DiaryEntry(id: 100, title: 'T', content: 'C', createdAt: now, updatedAt: now, tags: [Tag(id: 1, name: '工作', color: '#1877F2', createdAt: now)]);
+    final entry = DiaryEntry(
+      id: 100,
+      title: 'T',
+      content: 'C',
+      createdAt: now,
+      updatedAt: now,
+      tags: [Tag(id: 1, name: '工作', color: '#1877F2', createdAt: now)],
+    );
     await entryRepo.createDiaryEntry(entry);
-    getIt.registerSingleton<CreateDiaryEntryUseCase>(CreateDiaryEntryUseCase(entryRepo, tagRepo));
-    getIt.registerSingleton<UpdateDiaryEntryUseCase>(UpdateDiaryEntryUseCase(entryRepo, tagRepo));
+    getIt.registerSingleton<CreateDiaryEntryUseCase>(
+      CreateDiaryEntryUseCase(entryRepo, tagRepo),
+    );
+    getIt.registerSingleton<UpdateDiaryEntryUseCase>(
+      UpdateDiaryEntryUseCase(entryRepo, tagRepo),
+    );
 
     await _pumpEditor(tester, DiaryEditPage(diaryEntry: entry));
 
     final pageFinder2 = find.byType(DiaryEditPage);
-    await tester.enterText(find.descendant(of: pageFinder2, matching: find.byType(TextFormField)).first, 'T2');
-    await tester.enterText(find.descendant(of: pageFinder2, matching: find.byType(TextFormField)).last, 'C2');
+    await tester.enterText(
+      find
+          .descendant(of: pageFinder2, matching: find.byType(TextFormField))
+          .first,
+      'T2',
+    );
+    await tester.enterText(
+      find
+          .descendant(of: pageFinder2, matching: find.byType(TextFormField))
+          .last,
+      'C2',
+    );
     await tester.pump(const Duration(milliseconds: 100));
 
-    final publishBtn2 = find.ancestor(of: find.text('发布'), matching: find.byType(TextButton)).first;
+    final publishBtn2 = find
+        .ancestor(of: find.text('发布'), matching: find.byType(TextButton))
+        .first;
     await tester.ensureVisible(publishBtn2);
     await tester.tap(publishBtn2);
     await tester.pump(const Duration(milliseconds: 300));

@@ -14,17 +14,20 @@ void main() {
         designSize: const Size(390, 844),
         builder: (context, _) => MaterialApp(
           home: Scaffold(
-            body: SizedBox(width: 400, child: FacebookDiaryCard(
-              title: '标题',
-              content: '内容',
-              createdAt: now.subtract(const Duration(hours: 2)),
-              tags: const ['工作', '学习'],
-              isFavorite: false,
-              onFavoriteTap: () => fav++,
-              onEditTap: () => edit++,
-              onDeleteTap: () => del++,
-              onShareTap: () => share++,
-            )),
+            body: SizedBox(
+              width: 400,
+              child: FacebookDiaryCard(
+                title: '标题',
+                content: '内容',
+                createdAt: now.subtract(const Duration(hours: 2)),
+                tags: const ['工作', '学习'],
+                isFavorite: false,
+                onFavoriteTap: () => fav++,
+                onEditTap: () => edit++,
+                onDeleteTap: () => del++,
+                onShareTap: () => share++,
+              ),
+            ),
           ),
         ),
       ),

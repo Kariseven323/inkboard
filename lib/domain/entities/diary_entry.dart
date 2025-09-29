@@ -106,15 +106,15 @@ class DiaryEntry extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        content,
-        createdAt,
-        updatedAt,
-        isFavorite,
-        moodScore,
-        weather,
-        location,
-        tags,
-      ];
+    id,
+    title,
+    content,
+    createdAt,
+    updatedAt,
+    isFavorite,
+    moodScore,
+    weather,
+    location,
+    tags,
+  ];
 }

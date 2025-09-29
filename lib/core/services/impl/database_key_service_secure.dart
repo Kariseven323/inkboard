@@ -10,7 +10,7 @@ class SecureDatabaseKeyService implements DatabaseKeyService {
   final FlutterSecureStorage _storage;
 
   SecureDatabaseKeyService({FlutterSecureStorage? storage})
-      : _storage = storage ?? const FlutterSecureStorage();
+    : _storage = storage ?? const FlutterSecureStorage();
 
   @override
   Future<String> getOrCreateKey() async {

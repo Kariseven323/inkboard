@@ -23,21 +23,35 @@ void main() {
     getIt.registerSingleton<DeleteDiaryEntryUseCase>(deleteUc);
 
     final now = DateTime.now();
-    final entry = DiaryEntry(id: 9, title: '已收藏项', content: 'c', createdAt: now, updatedAt: now, isFavorite: true, tags: [Tag(id: 1, name: '工作', color: '#1877F2', createdAt: now)]);
+    final entry = DiaryEntry(
+      id: 9,
+      title: '已收藏项',
+      content: 'c',
+      createdAt: now,
+      updatedAt: now,
+      isFavorite: true,
+      tags: [Tag(id: 1, name: '工作', color: '#1877F2', createdAt: now)],
+    );
     await entryRepo.createDiaryEntry(entry);
 
-    final override = diaryEntriesProvider.overrideWith((ref) => Stream.value([entry]));
+    final override = diaryEntriesProvider.overrideWith(
+      (ref) => Stream.value([entry]),
+    );
 
     tester.view.devicePixelRatio = 1.0;
     tester.view.physicalSize = const Size(390, 844);
-    addTearDown(() { tester.view.resetPhysicalSize(); tester.view.resetDevicePixelRatio(); });
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
 
     await tester.pumpWidget(
       ProviderScope(
         overrides: [override],
         child: ScreenUtilInit(
           designSize: const Size(390, 844),
-          builder: (context, _) => const MaterialApp(home: Scaffold(body: HomePage())),
+          builder: (context, _) =>
+              const MaterialApp(home: Scaffold(body: HomePage())),
         ),
       ),
     );
@@ -50,4 +64,3 @@ void main() {
     expect(find.text('已取消收藏'), findsOneWidget);
   });
 }
-

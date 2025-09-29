@@ -7,17 +7,27 @@ import 'package:inkboard/domain/usecases/get_diary_entries_usecase.dart';
 class _RepoOk implements DiaryEntryRepository {
   final _now = DateTime.now();
   @override
-  Stream<List<DiaryEntry>> getAllDiaryEntries() => Stream.value([DiaryEntry(title: 'x', content: 'y', createdAt: _now, updatedAt: _now)]);
+  Stream<List<DiaryEntry>> getAllDiaryEntries() => Stream.value([
+    DiaryEntry(title: 'x', content: 'y', createdAt: _now, updatedAt: _now),
+  ]);
   @override
   Stream<List<DiaryEntry>> getFavoriteDiaryEntries() => Stream.value(const []);
   @override
-  Stream<List<DiaryEntry>> getDiaryEntriesByTags(List<int> tagIds) => Stream.value(const []);
+  Stream<List<DiaryEntry>> getDiaryEntriesByTags(List<int> tagIds) =>
+      Stream.value(const []);
   @override
-  Stream<List<DiaryEntry>> getDiaryEntriesByDateRange(DateTime startDate, DateTime endDate) => Stream.value(const []);
+  Stream<List<DiaryEntry>> getDiaryEntriesByDateRange(
+    DateTime startDate,
+    DateTime endDate,
+  ) => Stream.value(const []);
   @override
   Future<DiaryEntry?> getDiaryEntryById(int id) async => null;
   @override
-  Future<Map<String, int>> getDiaryStatistics() async => {'total': 1, 'favorites': 0, 'monthly': 1};
+  Future<Map<String, int>> getDiaryStatistics() async => {
+    'total': 1,
+    'favorites': 0,
+    'monthly': 1,
+  };
   @override
   Future<int> createDiaryEntry(DiaryEntry entry) async => 0;
   @override
@@ -27,7 +37,8 @@ class _RepoOk implements DiaryEntryRepository {
   @override
   Future<bool> deleteDiaryEntries(List<int> ids) async => false;
   @override
-  Stream<List<DiaryEntry>> searchDiaryEntries(String query) => Stream.value(const []);
+  Stream<List<DiaryEntry>> searchDiaryEntries(String query) =>
+      Stream.value(const []);
   @override
   Future<bool> toggleFavorite(int id) async => false;
   @override
@@ -38,7 +49,8 @@ class _RepoOk implements DiaryEntryRepository {
 
 class _RepoThrowsOnGetById extends _RepoOk {
   @override
-  Future<DiaryEntry?> getDiaryEntryById(int id) async => throw Exception('IDOops');
+  Future<DiaryEntry?> getDiaryEntryById(int id) async =>
+      throw Exception('IDOops');
 }
 
 void main() {
@@ -47,7 +59,10 @@ void main() {
     expect((await uc.getAllEntries().first).length, 1);
     expect(await uc.getFavoriteEntries().first, isEmpty);
     expect(await uc.getEntriesByTags(const [1]).first, isEmpty);
-    expect(await uc.getEntriesByDateRange(DateTime(2020), DateTime(2030)).first, isEmpty);
+    expect(
+      await uc.getEntriesByDateRange(DateTime(2020), DateTime(2030)).first,
+      isEmpty,
+    );
   });
 
   test('GetDiaryEntriesUseCase getEntryById 捕获异常', () async {
@@ -56,4 +71,3 @@ void main() {
     expect(r.isFailure, isTrue);
   });
 }
-

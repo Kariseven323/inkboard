@@ -44,10 +44,7 @@ class FacebookDiaryCard extends StatelessWidget {
         shadowColor: FacebookColors.shadow,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
-          side: const BorderSide(
-            color: FacebookColors.border,
-            width: 1,
-          ),
+          side: const BorderSide(color: FacebookColors.border, width: 1),
         ),
         child: InkWell(
           onTap: onTap,
@@ -126,15 +123,18 @@ class FacebookDiaryCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Hero(
-                tag: heroTag != null ? '${heroTag}_title' : UniqueKey().toString(),
-                flightShuttleBuilder: (context, animation, direction, fromContext, toContext) {
-                  // 使用透明Material包裹，避免文本样式在飞行中失真
-                  final Widget toHero = toContext.widget;
-                  return FadeTransition(
-                    opacity: animation.drive(Tween(begin: 0.6, end: 1.0)),
-                    child: toHero,
-                  );
-                },
+                tag: heroTag != null
+                    ? '${heroTag}_title'
+                    : UniqueKey().toString(),
+                flightShuttleBuilder:
+                    (context, animation, direction, fromContext, toContext) {
+                      // 使用透明Material包裹，避免文本样式在飞行中失真
+                      final Widget toHero = toContext.widget;
+                      return FadeTransition(
+                        opacity: animation.drive(Tween(begin: 0.6, end: 1.0)),
+                        child: toHero,
+                      );
+                    },
                 child: Material(
                   type: MaterialType.transparency,
                   child: Text(
@@ -273,11 +273,7 @@ class FacebookDiaryCard extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                icon,
-                color: color,
-                size: FacebookSizes.iconMedium,
-              ),
+              Icon(icon, color: color, size: FacebookSizes.iconMedium),
               SizedBox(width: FacebookSizes.spacing4),
               Flexible(
                 child: Text(
@@ -332,10 +328,7 @@ class FacebookDiaryCard extends StatelessWidget {
                 size: FacebookSizes.iconMedium,
               ),
               SizedBox(width: FacebookSizes.spacing8),
-              Text(
-                '删除日记',
-                style: TextStyle(color: FacebookColors.error),
-              ),
+              Text('删除日记', style: TextStyle(color: FacebookColors.error)),
             ],
           ),
         ),

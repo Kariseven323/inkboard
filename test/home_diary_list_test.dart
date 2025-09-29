@@ -20,9 +20,7 @@ void main() {
         createdAt: now,
         updatedAt: now,
         isFavorite: true,
-        tags: [
-          Tag(id: 1, name: '工作', color: '#1877F2', createdAt: now),
-        ],
+        tags: [Tag(id: 1, name: '工作', color: '#1877F2', createdAt: now)],
       ),
       DiaryEntry(
         id: 2,
@@ -57,7 +55,6 @@ void main() {
 
     expect(find.text('第一篇'), findsOneWidget);
     expect(find.text('第二篇'), findsOneWidget);
-
   });
 
   testWidgets('HomePage 空状态渲染', (tester) async {

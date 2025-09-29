@@ -19,7 +19,7 @@ part 'app_database.g.dart';
 class AppDatabase extends _$AppDatabase {
   /// 构造函数（允许测试传入自定义执行器和密钥服务）
   AppDatabase({QueryExecutor? executor, DatabaseKeyService? keyService})
-      : super(executor ?? _openConnection(keyService));
+    : super(executor ?? _openConnection(keyService));
 
   /// 数据库版本
   @override
@@ -102,7 +102,7 @@ class AppDatabase extends _$AppDatabase {
       await into(tags).insert(tag);
     }
   }
-  
+
   /// 容错创建 FTS5（title, content）及触发器
   Future<void> _tryEnsureFts5() async {
     try {
@@ -185,13 +185,16 @@ QueryExecutor _openConnection(DatabaseKeyService? keyService) {
     final file = File(p.join(dir.path, 'inkboard_database.sqlite'));
 
     // 使用 NativeDatabase，并在 setup 中尝试设置 SQLCipher 密钥（若可用）
-    return NativeDatabase.createInBackground(file, setup: (db) async {
-      try {
-        final key = keyService != null
-            ? await keyService.getOrCreateKey()
-            : 'inkboard_default_key';
-        db.execute('PRAGMA key = "$key";');
-      } catch (_) {}
-    });
+    return NativeDatabase.createInBackground(
+      file,
+      setup: (db) async {
+        try {
+          final key = keyService != null
+              ? await keyService.getOrCreateKey()
+              : 'inkboard_default_key';
+          db.execute('PRAGMA key = "$key";');
+        } catch (_) {}
+      },
+    );
   });
 }

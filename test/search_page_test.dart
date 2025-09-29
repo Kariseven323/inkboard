@@ -25,8 +25,16 @@ class _FakeSearchService implements SearchService {
       tags: [Tag(id: 1, name: '测试', color: '#1877F2', createdAt: now)],
     );
     return [
-      SearchResult(type: SearchResultType.diaryEntry, data: entry, snippet: '命中 **$query** 片段'),
-      SearchResult(type: SearchResultType.tag, data: Tag(id: 2, name: '学习', color: '#1877F2', createdAt: now), snippet: '标签 **学习**'),
+      SearchResult(
+        type: SearchResultType.diaryEntry,
+        data: entry,
+        snippet: '命中 **$query** 片段',
+      ),
+      SearchResult(
+        type: SearchResultType.tag,
+        data: Tag(id: 2, name: '学习', color: '#1877F2', createdAt: now),
+        snippet: '标签 **学习**',
+      ),
     ];
   }
 
@@ -41,7 +49,15 @@ class _FakeSearchService implements SearchService {
   }
 
   @override
-  Stream<List<DiaryEntry>> advancedSearchDiaryEntries({String? titleQuery, String? contentQuery, List<int>? tagIds, DateTime? startDate, DateTime? endDate, bool? isFavorite, int? moodScore}) async* {
+  Stream<List<DiaryEntry>> advancedSearchDiaryEntries({
+    String? titleQuery,
+    String? contentQuery,
+    List<int>? tagIds,
+    DateTime? startDate,
+    DateTime? endDate,
+    bool? isFavorite,
+    int? moodScore,
+  }) async* {
     final now = DateTime.now();
     yield [
       DiaryEntry(
@@ -74,11 +90,15 @@ void main() {
   setUp(() async {
     await getIt.reset();
     final fakeService = _FakeSearchService();
-    getIt.registerSingleton<SearchDiaryUseCase>(SearchDiaryUseCase(fakeService));
+    getIt.registerSingleton<SearchDiaryUseCase>(
+      SearchDiaryUseCase(fakeService),
+    );
     // 注册收藏切换用例，避免点击心形时出错
     final entryRepo = InMemoryDiaryEntryRepository();
     final tagRepo = InMemoryTagRepository();
-    getIt.registerSingleton<UpdateDiaryEntryUseCase>(UpdateDiaryEntryUseCase(entryRepo, tagRepo));
+    getIt.registerSingleton<UpdateDiaryEntryUseCase>(
+      UpdateDiaryEntryUseCase(entryRepo, tagRepo),
+    );
   });
 
   testWidgets('SearchPage 初始为空态显示提示', (tester) async {
@@ -103,7 +123,8 @@ void main() {
       ProviderScope(
         child: ScreenUtilInit(
           designSize: const Size(390, 844),
-          builder: (context, _) => const MaterialApp(home: SearchPage(initialQuery: 'Foo')),
+          builder: (context, _) =>
+              const MaterialApp(home: SearchPage(initialQuery: 'Foo')),
         ),
       ),
     );
@@ -118,7 +139,8 @@ void main() {
       ProviderScope(
         child: ScreenUtilInit(
           designSize: const Size(390, 844),
-          builder: (context, _) => const MaterialApp(home: SearchPage(initialQuery: 'hello')),
+          builder: (context, _) =>
+              const MaterialApp(home: SearchPage(initialQuery: 'hello')),
         ),
       ),
     );
@@ -134,7 +156,8 @@ void main() {
       ProviderScope(
         child: ScreenUtilInit(
           designSize: const Size(390, 844),
-          builder: (context, _) => const MaterialApp(home: SearchPage(initialQuery: 'hello')),
+          builder: (context, _) =>
+              const MaterialApp(home: SearchPage(initialQuery: 'hello')),
         ),
       ),
     );
@@ -151,13 +174,19 @@ void main() {
     final svc = _AdvancedErrorSearchService();
     getIt.registerSingleton<SearchDiaryUseCase>(SearchDiaryUseCase(svc));
     // 注册更新用例占位
-    getIt.registerSingleton<UpdateDiaryEntryUseCase>(UpdateDiaryEntryUseCase(InMemoryDiaryEntryRepository(), InMemoryTagRepository()));
+    getIt.registerSingleton<UpdateDiaryEntryUseCase>(
+      UpdateDiaryEntryUseCase(
+        InMemoryDiaryEntryRepository(),
+        InMemoryTagRepository(),
+      ),
+    );
 
     await tester.pumpWidget(
       ProviderScope(
         child: ScreenUtilInit(
           designSize: const Size(390, 844),
-          builder: (context, _) => const MaterialApp(home: SearchPage(initialQuery: 'x')),
+          builder: (context, _) =>
+              const MaterialApp(home: SearchPage(initialQuery: 'x')),
         ),
       ),
     );
@@ -174,7 +203,9 @@ void main() {
     getIt.registerSingleton<SearchDiaryUseCase>(SearchDiaryUseCase(badService));
     final entryRepo = InMemoryDiaryEntryRepository();
     final tagRepo = InMemoryTagRepository();
-    getIt.registerSingleton<UpdateDiaryEntryUseCase>(UpdateDiaryEntryUseCase(entryRepo, tagRepo));
+    getIt.registerSingleton<UpdateDiaryEntryUseCase>(
+      UpdateDiaryEntryUseCase(entryRepo, tagRepo),
+    );
 
     await tester.pumpWidget(
       ProviderScope(
@@ -198,11 +229,14 @@ void main() {
       ProviderScope(
         overrides: [
           // 覆盖搜索结果为：空
-          searchResultsProvider.overrideWithProvider((query) => FutureProvider((ref) async => <SearchResult>[])),
+          searchResultsProvider.overrideWithProvider(
+            (query) => FutureProvider((ref) async => <SearchResult>[]),
+          ),
         ],
         child: ScreenUtilInit(
           designSize: const Size(390, 844),
-          builder: (context, _) => const MaterialApp(home: SearchPage(initialQuery: 'x')),
+          builder: (context, _) =>
+              const MaterialApp(home: SearchPage(initialQuery: 'x')),
         ),
       ),
     );
@@ -224,7 +258,15 @@ class _ThrowingSearchService extends _FakeSearchService {
 
 class _AdvancedErrorSearchService extends _FakeSearchService {
   @override
-  Stream<List<DiaryEntry>> advancedSearchDiaryEntries({String? titleQuery, String? contentQuery, List<int>? tagIds, DateTime? startDate, DateTime? endDate, bool? isFavorite, int? moodScore}) async* {
+  Stream<List<DiaryEntry>> advancedSearchDiaryEntries({
+    String? titleQuery,
+    String? contentQuery,
+    List<int>? tagIds,
+    DateTime? startDate,
+    DateTime? endDate,
+    bool? isFavorite,
+    int? moodScore,
+  }) async* {
     yield* Stream<List<DiaryEntry>>.error(Exception('BAD_STREAM'));
   }
 }

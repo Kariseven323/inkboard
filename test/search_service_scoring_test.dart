@@ -19,16 +19,20 @@ void main() {
     final create = CreateDiaryEntryUseCase(harness.diaryRepo, harness.tagRepo);
     final searchService = SearchServiceImpl(harness.diaryRepo, harness.tagRepo);
 
-    await create.execute(CreateDiaryEntryParams(
-      title: 'Flutter Drift 全文搜索',
-      content: '使用 FTS5 与 SQLCipher 进行加密与全文搜索',
-      tagNames: const [],
-    ));
-    await create.execute(CreateDiaryEntryParams(
-      title: '普通标题',
-      content: '无关内容',
-      tagNames: const [],
-    ));
+    await create.execute(
+      CreateDiaryEntryParams(
+        title: 'Flutter Drift 全文搜索',
+        content: '使用 FTS5 与 SQLCipher 进行加密与全文搜索',
+        tagNames: const [],
+      ),
+    );
+    await create.execute(
+      CreateDiaryEntryParams(
+        title: '普通标题',
+        content: '无关内容',
+        tagNames: const [],
+      ),
+    );
 
     final items = await searchService.globalSearch('全文搜索');
     expect(items.isNotEmpty, isTrue);

@@ -12,7 +12,11 @@ import 'package:inkboard/presentation/providers/diary_provider.dart';
 void main() {
   testWidgets('HomePage 加载与错误状态渲染', (tester) async {
     // 辅助：等待直到找到指定文本，避免异步/时序抖动
-    Future<void> pumpUntilFound(Finder finder, {int maxTicks = 60, Duration step = const Duration(milliseconds: 50)}) async {
+    Future<void> pumpUntilFound(
+      Finder finder, {
+      int maxTicks = 60,
+      Duration step = const Duration(milliseconds: 50),
+    }) async {
       for (var i = 0; i < maxTicks; i++) {
         if (finder.evaluate().isNotEmpty) return;
         await tester.pump(step);
@@ -21,14 +25,17 @@ void main() {
 
     // 加载态：使用不立即发射的 Stream
     final loadingCtrl = StreamController<List<DiaryEntry>>();
-    final loadingOverride = diaryEntriesProvider.overrideWith((ref) => loadingCtrl.stream);
+    final loadingOverride = diaryEntriesProvider.overrideWith(
+      (ref) => loadingCtrl.stream,
+    );
 
     await tester.pumpWidget(
       ProviderScope(
         overrides: [loadingOverride],
         child: ScreenUtilInit(
           designSize: const Size(390, 844),
-          builder: (context, _) => const MaterialApp(home: Scaffold(body: HomePage())),
+          builder: (context, _) =>
+              const MaterialApp(home: Scaffold(body: HomePage())),
         ),
       ),
     );
@@ -53,7 +60,8 @@ void main() {
         overrides: [errorOverride],
         child: ScreenUtilInit(
           designSize: const Size(390, 844),
-          builder: (context, _) => const MaterialApp(home: Scaffold(body: HomePage())),
+          builder: (context, _) =>
+              const MaterialApp(home: Scaffold(body: HomePage())),
         ),
       ),
     );

@@ -13,9 +13,11 @@ import 'package:inkboard/presentation/providers/diary_provider.dart';
 import 'fakes.dart';
 
 class _FailToggleUsecase extends UpdateDiaryEntryUseCase {
-  _FailToggleUsecase() : super(InMemoryDiaryEntryRepository(), InMemoryTagRepository());
+  _FailToggleUsecase()
+    : super(InMemoryDiaryEntryRepository(), InMemoryTagRepository());
   @override
-  Future<Result<bool>> toggleFavorite(int id) async => Result.failure('ToggleOops');
+  Future<Result<bool>> toggleFavorite(int id) async =>
+      Result.failure('ToggleOops');
 }
 
 void main() {
@@ -35,18 +37,24 @@ void main() {
       isFavorite: false,
       tags: [Tag(id: 1, name: '工作', color: '#1877F2', createdAt: now)],
     );
-    final override = diaryEntriesProvider.overrideWith((ref) => Stream.value([entry]));
+    final override = diaryEntriesProvider.overrideWith(
+      (ref) => Stream.value([entry]),
+    );
 
     tester.view.devicePixelRatio = 1.0;
     tester.view.physicalSize = const Size(390, 844);
-    addTearDown(() { tester.view.resetPhysicalSize(); tester.view.resetDevicePixelRatio(); });
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
 
     await tester.pumpWidget(
       ProviderScope(
         overrides: [override],
         child: ScreenUtilInit(
           designSize: const Size(390, 844),
-          builder: (context, _) => const MaterialApp(home: Scaffold(body: HomePage())),
+          builder: (context, _) =>
+              const MaterialApp(home: Scaffold(body: HomePage())),
         ),
       ),
     );
@@ -59,5 +67,6 @@ void main() {
 }
 
 class _FakeDeleteUsecase extends DeleteDiaryEntryUseCase {
-  _FakeDeleteUsecase() : super(InMemoryDiaryEntryRepository(), InMemoryTagRepository());
+  _FakeDeleteUsecase()
+    : super(InMemoryDiaryEntryRepository(), InMemoryTagRepository());
 }

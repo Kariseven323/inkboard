@@ -11,10 +11,7 @@ class UpdateDiaryEntryUseCase {
   final DiaryEntryRepository _diaryEntryRepository;
   final TagRepository _tagRepository;
 
-  UpdateDiaryEntryUseCase(
-    this._diaryEntryRepository,
-    this._tagRepository,
-  );
+  UpdateDiaryEntryUseCase(this._diaryEntryRepository, this._tagRepository);
 
   /// 执行更新日记条目
   Future<Result<bool>> execute(UpdateDiaryEntryParams params) async {
@@ -43,11 +40,13 @@ class UpdateDiaryEntryUseCase {
         Tag? tag = await _tagRepository.getTagByName(tagName);
         if (tag == null) {
           // 创建新标签
-          final tagId = await _tagRepository.createTag(Tag(
-            name: tagName,
-            color: params.defaultTagColor ?? '#1877F2',
-            createdAt: DateTime.now(),
-          ));
+          final tagId = await _tagRepository.createTag(
+            Tag(
+              name: tagName,
+              color: params.defaultTagColor ?? '#1877F2',
+              createdAt: DateTime.now(),
+            ),
+          );
           tag = await _tagRepository.getTagById(tagId);
         }
 
@@ -81,7 +80,9 @@ class UpdateDiaryEntryUseCase {
         tags: tags,
       );
 
-      final success = await _diaryEntryRepository.updateDiaryEntry(updatedEntry);
+      final success = await _diaryEntryRepository.updateDiaryEntry(
+        updatedEntry,
+      );
       if (success) {
         return Result.success(true);
       } else {
@@ -113,10 +114,7 @@ class DeleteDiaryEntryUseCase {
   final DiaryEntryRepository _diaryEntryRepository;
   final TagRepository _tagRepository;
 
-  DeleteDiaryEntryUseCase(
-    this._diaryEntryRepository,
-    this._tagRepository,
-  );
+  DeleteDiaryEntryUseCase(this._diaryEntryRepository, this._tagRepository);
 
   /// 删除单个日记条目
   Future<Result<bool>> execute(int id) async {

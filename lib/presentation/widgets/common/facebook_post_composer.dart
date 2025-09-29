@@ -36,10 +36,7 @@ class _FacebookPostComposerState extends State<FacebookPostComposer> {
         elevation: FacebookSizes.cardElevation,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
-          side: const BorderSide(
-            color: FacebookColors.border,
-            width: 1,
-          ),
+          side: const BorderSide(color: FacebookColors.border, width: 1),
         ),
         child: Padding(
           padding: FacebookSizes.paddingAll,
@@ -94,10 +91,7 @@ class _FacebookPostComposerState extends State<FacebookPostComposer> {
               decoration: BoxDecoration(
                 color: FacebookColors.inputBackground,
                 borderRadius: BorderRadius.circular(FacebookSizes.radiusRound),
-                border: Border.all(
-                  color: FacebookColors.inputBorder,
-                  width: 1,
-                ),
+                border: Border.all(color: FacebookColors.inputBorder, width: 1),
               ),
               child: Text(
                 widget.placeholder ?? '今天你想记录什么？',
@@ -108,7 +102,8 @@ class _FacebookPostComposerState extends State<FacebookPostComposer> {
             );
 
             // 特别窄的情况下，改用垂直布局避免溢出
-            if (constraints.maxWidth < (FacebookSizes.avatarMedium + FacebookSizes.spacing12 + 120)) {
+            if (constraints.maxWidth <
+                (FacebookSizes.avatarMedium + FacebookSizes.spacing12 + 120)) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -213,49 +208,45 @@ class _FacebookPostComposerState extends State<FacebookPostComposer> {
   }) {
     return Material(
       color: Colors.transparent,
-      child: LayoutBuilder(builder: (context, constraints) {
-        final isCompact = compact || constraints.maxWidth < 120;
-        return InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
-          child: Container(
-            padding: isCompact
-                ? const EdgeInsets.all(6)
-                : EdgeInsets.symmetric(
-                    horizontal: FacebookSizes.spacing8,
-                    vertical: FacebookSizes.spacing8,
-                  ),
-            child: isCompact
-                ? Center(
-                    child: Icon(
-                      icon,
-                      color: color,
-                      size: 18.0,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isCompact = compact || constraints.maxWidth < 120;
+          return InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
+            child: Container(
+              padding: isCompact
+                  ? const EdgeInsets.all(6)
+                  : EdgeInsets.symmetric(
+                      horizontal: FacebookSizes.spacing8,
+                      vertical: FacebookSizes.spacing8,
                     ),
-                  )
-                : Wrap(
-                    alignment: WrapAlignment.center,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: FacebookSizes.spacing8,
-                    children: [
-                      Icon(
-                        icon,
-                        color: color,
-                        size: FacebookSizes.iconMedium,
-                      ),
-                      Text(
-                        label,
-                        style: FacebookTextStyles.bodySmall.copyWith(
-                          color: FacebookColors.textSecondary,
-                          fontWeight: FontWeight.w500,
+              child: isCompact
+                  ? Center(child: Icon(icon, color: color, size: 18.0))
+                  : Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: FacebookSizes.spacing8,
+                      children: [
+                        Icon(
+                          icon,
+                          color: color,
+                          size: FacebookSizes.iconMedium,
                         ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-          ),
-        );
-      }),
+                        Text(
+                          label,
+                          style: FacebookTextStyles.bodySmall.copyWith(
+                            color: FacebookColors.textSecondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

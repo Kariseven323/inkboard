@@ -14,4 +14,3 @@ void main() {
     expect(container.read(themeProvider), AppThemeMode.dark);
   });
 }
-

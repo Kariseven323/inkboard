@@ -17,4 +17,3 @@ void main() {
     expect(container.read(textScaleProvider), closeTo(1.5, 0.0001));
   });
 }
-

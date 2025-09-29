@@ -103,7 +103,11 @@ class HomePage extends ConsumerWidget {
   }
 
   /// 构建日记卡片
-  Widget _buildDiaryCard(BuildContext context, DiaryEntry entry, {String? heroTag}) {
+  Widget _buildDiaryCard(
+    BuildContext context,
+    DiaryEntry entry, {
+    String? heroTag,
+  }) {
     return FacebookDiaryCard(
       title: entry.title,
       content: entry.content,
@@ -157,10 +161,7 @@ class HomePage extends ConsumerWidget {
         elevation: FacebookSizes.cardElevation,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
-          side: const BorderSide(
-            color: FacebookColors.border,
-            width: 1,
-          ),
+          side: const BorderSide(color: FacebookColors.border, width: 1),
         ),
         child: Padding(
           padding: FacebookSizes.paddingAll,
@@ -204,18 +205,13 @@ class HomePage extends ConsumerWidget {
         elevation: FacebookSizes.cardElevation,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
-          side: const BorderSide(
-            color: FacebookColors.border,
-            width: 1,
-          ),
+          side: const BorderSide(color: FacebookColors.border, width: 1),
         ),
         child: Padding(
           padding: FacebookSizes.paddingAll,
           child: Column(
             children: [
-              CircularProgressIndicator(
-                color: FacebookColors.primary,
-              ),
+              CircularProgressIndicator(color: FacebookColors.primary),
               SizedBox(height: FacebookSizes.spacing16),
               Text(
                 '正在加载日记...',
@@ -239,20 +235,13 @@ class HomePage extends ConsumerWidget {
         elevation: FacebookSizes.cardElevation,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
-          side: const BorderSide(
-            color: FacebookColors.border,
-            width: 1,
-          ),
+          side: const BorderSide(color: FacebookColors.border, width: 1),
         ),
         child: Padding(
           padding: FacebookSizes.paddingAll,
           child: Column(
             children: [
-              Icon(
-                Icons.error_outline,
-                size: 64,
-                color: FacebookColors.error,
-              ),
+              Icon(Icons.error_outline, size: 64, color: FacebookColors.error),
               SizedBox(height: FacebookSizes.spacing16),
               Text(
                 '加载失败',
@@ -279,7 +268,10 @@ class HomePage extends ConsumerWidget {
   }
 
   /// 打开日记编辑页面
-  Future<void> _openDiaryEditPage(BuildContext context, [DiaryEntry? diaryEntry]) async {
+  Future<void> _openDiaryEditPage(
+    BuildContext context, [
+    DiaryEntry? diaryEntry,
+  ]) async {
     final result = await Navigator.of(context).push<bool>(
       CupertinoPageRoute(
         builder: (context) => DiaryEditPage(diaryEntry: diaryEntry),
@@ -293,7 +285,10 @@ class HomePage extends ConsumerWidget {
   }
 
   /// 显示删除确认对话框
-  Future<bool> _showDeleteConfirmDialog(BuildContext context, DiaryEntry entry) async {
+  Future<bool> _showDeleteConfirmDialog(
+    BuildContext context,
+    DiaryEntry entry,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -399,7 +394,11 @@ class HomePage extends ConsumerWidget {
   }
 
   /// 包装Dismissible实现滑动删除
-  Widget _buildDismissible(BuildContext context, DiaryEntry entry, {required Widget child}) {
+  Widget _buildDismissible(
+    BuildContext context,
+    DiaryEntry entry, {
+    required Widget child,
+  }) {
     return Dismissible(
       key: ValueKey('entry_${entry.id}'),
       direction: DismissDirection.endToStart,
@@ -444,13 +443,18 @@ class HomePage extends ConsumerWidget {
   }
 
   /// 长按弹出操作菜单
-  Future<void> _showEntryActionSheet(BuildContext context, DiaryEntry entry) async {
+  Future<void> _showEntryActionSheet(
+    BuildContext context,
+    DiaryEntry entry,
+  ) async {
     HapticFeedback.lightImpact();
     await showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(FacebookSizes.radiusLarge)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(FacebookSizes.radiusLarge),
+        ),
       ),
       builder: (_) {
         return SafeArea(
@@ -468,8 +472,10 @@ class HomePage extends ConsumerWidget {
                   },
                 ),
                 ListTile(
-                  leading: Icon(entry.isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: entry.isFavorite ? FacebookColors.error : null),
+                  leading: Icon(
+                    entry.isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: entry.isFavorite ? FacebookColors.error : null,
+                  ),
                   title: Text(entry.isFavorite ? '取消收藏' : '收藏'),
                   onTap: () async {
                     Navigator.of(context).pop();
@@ -477,7 +483,10 @@ class HomePage extends ConsumerWidget {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.delete_outline, color: FacebookColors.error),
+                  leading: const Icon(
+                    Icons.delete_outline,
+                    color: FacebookColors.error,
+                  ),
                   title: const Text('删除日记'),
                   onTap: () async {
                     Navigator.of(context).pop();
@@ -537,9 +546,7 @@ class HomePage extends ConsumerWidget {
                     size: FacebookSizes.iconSmall,
                   ),
                   SizedBox(width: FacebookSizes.spacing8),
-                  Expanded(
-                    child: Text(result.error ?? '删除失败'),
-                  ),
+                  Expanded(child: Text(result.error ?? '删除失败')),
                 ],
               ),
               backgroundColor: FacebookColors.error,
@@ -563,9 +570,7 @@ class HomePage extends ConsumerWidget {
                   size: FacebookSizes.iconSmall,
                 ),
                 SizedBox(width: FacebookSizes.spacing8),
-                Expanded(
-                  child: Text('删除失败：$e'),
-                ),
+                Expanded(child: Text('删除失败：$e')),
               ],
             ),
             backgroundColor: FacebookColors.error,
@@ -621,9 +626,7 @@ class HomePage extends ConsumerWidget {
                     size: FacebookSizes.iconSmall,
                   ),
                   SizedBox(width: FacebookSizes.spacing8),
-                  Expanded(
-                    child: Text(result.error ?? '收藏操作失败'),
-                  ),
+                  Expanded(child: Text(result.error ?? '收藏操作失败')),
                 ],
               ),
               backgroundColor: FacebookColors.error,
@@ -647,9 +650,7 @@ class HomePage extends ConsumerWidget {
                   size: FacebookSizes.iconSmall,
                 ),
                 SizedBox(width: FacebookSizes.spacing8),
-                Expanded(
-                  child: Text('收藏操作失败：$e'),
-                ),
+                Expanded(child: Text('收藏操作失败：$e')),
               ],
             ),
             backgroundColor: FacebookColors.error,

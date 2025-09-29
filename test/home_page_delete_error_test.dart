@@ -38,21 +38,31 @@ void main() {
     final entryRepo = InMemoryDiaryEntryRepository();
     final tagRepo = InMemoryTagRepository();
     await entryRepo.createDiaryEntry(entry);
-    getIt.registerSingleton<UpdateDiaryEntryUseCase>(UpdateDiaryEntryUseCase(entryRepo, tagRepo));
-    getIt.registerSingleton<DeleteDiaryEntryUseCase>(_FailingDeleteUsecase(entryRepo, tagRepo));
+    getIt.registerSingleton<UpdateDiaryEntryUseCase>(
+      UpdateDiaryEntryUseCase(entryRepo, tagRepo),
+    );
+    getIt.registerSingleton<DeleteDiaryEntryUseCase>(
+      _FailingDeleteUsecase(entryRepo, tagRepo),
+    );
 
-    final listOverride = diaryEntriesProvider.overrideWith((ref) => Stream.value([entry]));
+    final listOverride = diaryEntriesProvider.overrideWith(
+      (ref) => Stream.value([entry]),
+    );
 
     tester.view.devicePixelRatio = 1.0;
     tester.view.physicalSize = const Size(390, 844);
-    addTearDown(() { tester.view.resetPhysicalSize(); tester.view.resetDevicePixelRatio(); });
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
 
     await tester.pumpWidget(
       ProviderScope(
         overrides: [listOverride],
         child: ScreenUtilInit(
           designSize: const Size(390, 844),
-          builder: (context, _) => const MaterialApp(home: Scaffold(body: HomePage())),
+          builder: (context, _) =>
+              const MaterialApp(home: Scaffold(body: HomePage())),
         ),
       ),
     );

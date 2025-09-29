@@ -6,7 +6,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:inkboard/presentation/pages/diary_edit_page.dart';
 
 void main() {
-  Future<void> pumpEditor(WidgetTester tester, {Size size = const Size(1200, 900)}) async {
+  Future<void> pumpEditor(
+    WidgetTester tester, {
+    Size size = const Size(1200, 900),
+  }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
@@ -35,11 +38,17 @@ void main() {
 
     // 预览区包含文本（限定在预览容器内，避免编辑器中的重复匹配）
     expect(
-      find.descendant(of: find.byKey(const ValueKey('preview')), matching: find.textContaining('Title')),
+      find.descendant(
+        of: find.byKey(const ValueKey('preview')),
+        matching: find.textContaining('Title'),
+      ),
       findsOneWidget,
     );
     expect(
-      find.descendant(of: find.byKey(const ValueKey('preview')), matching: find.textContaining('bold')),
+      find.descendant(
+        of: find.byKey(const ValueKey('preview')),
+        matching: find.textContaining('bold'),
+      ),
       findsWidgets,
     );
   });

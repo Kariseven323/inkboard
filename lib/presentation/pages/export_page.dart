@@ -55,8 +55,8 @@ class _ExportPageState extends State<ExportPage> {
               child: _loading
                   ? const Center(child: CircularProgressIndicator())
                   : _markdown == null
-                      ? const Center(child: Text('点击上方按钮生成导出内容'))
-                      : SelectableText(_markdown!),
+                  ? const Center(child: Text('点击上方按钮生成导出内容'))
+                  : SelectableText(_markdown!),
             ),
           ],
         ),

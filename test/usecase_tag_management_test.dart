@@ -17,7 +17,9 @@ void main() {
   test('tag management use cases', () async {
     final uc = TagManagementUseCase(harness.tagRepo);
 
-    final create = await uc.createTag(CreateTagParams(name: '用例标签', color: '#123456'));
+    final create = await uc.createTag(
+      CreateTagParams(name: '用例标签', color: '#123456'),
+    );
     expect(create.isSuccess, isTrue);
     final id = create.dataOrThrow;
 
@@ -25,7 +27,9 @@ void main() {
     expect(getRes.isSuccess, isTrue);
     expect(getRes.dataOrThrow.name, '用例标签');
 
-    final upd = await uc.updateTag(UpdateTagParams(id: id, name: '用例标签2', color: '#654321'));
+    final upd = await uc.updateTag(
+      UpdateTagParams(id: id, name: '用例标签2', color: '#654321'),
+    );
     expect(upd.isSuccess, isTrue);
 
     final stats = await uc.getStatistics();
@@ -35,4 +39,3 @@ void main() {
     expect(del.isSuccess, isTrue);
   });
 }
-

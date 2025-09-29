@@ -14,7 +14,11 @@ void main() {
     // 初始为 system（可能异步加载后仍为 system）
     await Future<void>.delayed(const Duration(milliseconds: 10));
     expect(
-      [AppThemeMode.system, AppThemeMode.light, AppThemeMode.dark].contains(notifier.state),
+      [
+        AppThemeMode.system,
+        AppThemeMode.light,
+        AppThemeMode.dark,
+      ].contains(notifier.state),
       isTrue,
     );
 
@@ -35,4 +39,3 @@ void main() {
     expect(notifier.state, AppThemeMode.system);
   });
 }
-

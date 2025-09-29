@@ -12,10 +12,7 @@ class CreateDiaryEntryUseCase {
   final DiaryEntryRepository _diaryEntryRepository;
   final TagRepository _tagRepository;
 
-  CreateDiaryEntryUseCase(
-    this._diaryEntryRepository,
-    this._tagRepository,
-  );
+  CreateDiaryEntryUseCase(this._diaryEntryRepository, this._tagRepository);
 
   /// 执行创建日记条目
   Future<Result<int>> execute(CreateDiaryEntryParams params) async {
@@ -36,11 +33,13 @@ class CreateDiaryEntryUseCase {
         Tag? tag = await _tagRepository.getTagByName(tagName);
         if (tag == null) {
           // 创建新标签
-          final tagId = await _tagRepository.createTag(Tag(
-            name: tagName,
-            color: params.defaultTagColor ?? '#1877F2',
-            createdAt: DateTime.now(),
-          ));
+          final tagId = await _tagRepository.createTag(
+            Tag(
+              name: tagName,
+              color: params.defaultTagColor ?? '#1877F2',
+              createdAt: DateTime.now(),
+            ),
+          );
           tag = await _tagRepository.getTagById(tagId);
         }
 

@@ -21,11 +21,13 @@ void main() {
     final searchService = SearchServiceImpl(harness.diaryRepo, harness.tagRepo);
     final search = SearchDiaryUseCase(searchService);
 
-    final res = await create.execute(CreateDiaryEntryParams(
-      title: '项目总结',
-      content: '包含加密字段与搜索功能验证',
-      tagNames: ['生活', '思考'],
-    ));
+    final res = await create.execute(
+      CreateDiaryEntryParams(
+        title: '项目总结',
+        content: '包含加密字段与搜索功能验证',
+        tagNames: ['生活', '思考'],
+      ),
+    );
     expect(res.isSuccess, isTrue);
 
     final global = await search.globalSearch('搜索');
@@ -36,4 +38,3 @@ void main() {
     expect(diaryHits.any((e) => e.title == '项目总结'), isTrue);
   });
 }
-

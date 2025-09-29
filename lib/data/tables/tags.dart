@@ -24,6 +24,6 @@ class Tags extends Table {
   /// 确保标签名称唯一
   @override
   List<Set<Column>>? get uniqueKeys => [
-        {name}
-      ];
+    {name},
+  ];
 }

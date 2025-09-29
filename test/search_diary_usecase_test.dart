@@ -22,7 +22,15 @@ class _OKService implements SearchService {
   }
 
   @override
-  Stream<List<DiaryEntry>> advancedSearchDiaryEntries({String? titleQuery, String? contentQuery, List<int>? tagIds, DateTime? startDate, DateTime? endDate, bool? isFavorite, int? moodScore}) async* {
+  Stream<List<DiaryEntry>> advancedSearchDiaryEntries({
+    String? titleQuery,
+    String? contentQuery,
+    List<int>? tagIds,
+    DateTime? startDate,
+    DateTime? endDate,
+    bool? isFavorite,
+    int? moodScore,
+  }) async* {
     yield const [];
   }
 
@@ -44,16 +52,19 @@ class _OKService implements SearchService {
 
 class _ErrorService extends _OKService {
   @override
-  Future<List<SearchResult>> globalSearch(String query) async => throw Exception('boom');
+  Future<List<SearchResult>> globalSearch(String query) async =>
+      throw Exception('boom');
 
   @override
-  Future<List<String>> getSearchSuggestions(String query) async => throw Exception('boom');
+  Future<List<String>> getSearchSuggestions(String query) async =>
+      throw Exception('boom');
 
   @override
   Future<List<String>> getPopularSearchTerms() async => throw Exception('boom');
 
   @override
-  Future<List<String>> getSearchHistory({int limit = 10}) async => throw Exception('boom');
+  Future<List<String>> getSearchHistory({int limit = 10}) async =>
+      throw Exception('boom');
 
   @override
   Future<void> clearSearchHistory() async => throw Exception('boom');

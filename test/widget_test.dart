@@ -18,7 +18,9 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          diaryEntriesProvider.overrideWith((ref) => Stream<List<DiaryEntry>>.value(const [])),
+          diaryEntriesProvider.overrideWith(
+            (ref) => Stream<List<DiaryEntry>>.value(const []),
+          ),
         ],
         child: const InkboardApp(),
       ),

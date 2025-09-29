@@ -18,11 +18,7 @@ void main() {
       tester.view.resetDevicePixelRatio();
     });
 
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: InkboardApp(),
-      ),
-    );
+    await tester.pumpWidget(const ProviderScope(child: InkboardApp()));
     await tester.pump(const Duration(milliseconds: 300));
   }
 
@@ -46,7 +42,9 @@ void main() {
     expect(find.text('© 2025 ultrathink'), findsOneWidget);
   });
 
-  testWidgets('右侧栏：常用标签/写作统计/写作提示/历史上的今天（移动端右侧抽屉）', (WidgetTester tester) async {
+  testWidgets('右侧栏：常用标签/写作统计/写作提示/历史上的今天（移动端右侧抽屉）', (
+    WidgetTester tester,
+  ) async {
     await pumpMobile(tester);
 
     // 打开右侧抽屉

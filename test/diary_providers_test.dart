@@ -15,9 +15,28 @@ void main() {
     await getIt.reset();
     final repo = InMemoryDiaryEntryRepository();
     final now = DateTime.now();
-    await repo.createDiaryEntry(DiaryEntry(id: 1, title: 'A', content: 'A', createdAt: now, updatedAt: now, isFavorite: true));
-    await repo.createDiaryEntry(DiaryEntry(id: 2, title: 'B', content: 'B', createdAt: now, updatedAt: now));
-    getIt.registerSingleton<GetDiaryEntriesUseCase>(GetDiaryEntriesUseCase(repo));
+    await repo.createDiaryEntry(
+      DiaryEntry(
+        id: 1,
+        title: 'A',
+        content: 'A',
+        createdAt: now,
+        updatedAt: now,
+        isFavorite: true,
+      ),
+    );
+    await repo.createDiaryEntry(
+      DiaryEntry(
+        id: 2,
+        title: 'B',
+        content: 'B',
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
+    getIt.registerSingleton<GetDiaryEntriesUseCase>(
+      GetDiaryEntriesUseCase(repo),
+    );
 
     late AsyncValue<dynamic> asyncStats;
     await tester.pumpWidget(
@@ -51,8 +70,19 @@ void main() {
     final repo = InMemoryDiaryEntryRepository();
     final now = DateTime.now();
     final t1 = Tag(id: 1, name: 'X', color: '#1877F2', createdAt: now);
-    await repo.createDiaryEntry(DiaryEntry(id: 1, title: 'A', content: 'A', createdAt: now, updatedAt: now, tags: [t1]));
-    getIt.registerSingleton<GetDiaryEntriesUseCase>(GetDiaryEntriesUseCase(repo));
+    await repo.createDiaryEntry(
+      DiaryEntry(
+        id: 1,
+        title: 'A',
+        content: 'A',
+        createdAt: now,
+        updatedAt: now,
+        tags: [t1],
+      ),
+    );
+    getIt.registerSingleton<GetDiaryEntriesUseCase>(
+      GetDiaryEntriesUseCase(repo),
+    );
 
     await tester.pumpWidget(
       ProviderScope(
@@ -60,11 +90,19 @@ void main() {
           home: Consumer(
             builder: (context, ref, _) {
               final byTags = ref.watch(diaryEntriesByTagsProvider(const [1]));
-              final byDate = ref.watch(diaryEntriesByDateRangeProvider(
-                DateRange(startDate: now.subtract(const Duration(days: 1)), endDate: now.add(const Duration(days: 1))),
-              ));
+              final byDate = ref.watch(
+                diaryEntriesByDateRangeProvider(
+                  DateRange(
+                    startDate: now.subtract(const Duration(days: 1)),
+                    endDate: now.add(const Duration(days: 1)),
+                  ),
+                ),
+              );
               return Column(
-                children: [Text('tags:${byTags.asData?.value.length ?? 0}'), Text('date:${byDate.asData?.value.length ?? 0}')],
+                children: [
+                  Text('tags:${byTags.asData?.value.length ?? 0}'),
+                  Text('date:${byDate.asData?.value.length ?? 0}'),
+                ],
               );
             },
           ),

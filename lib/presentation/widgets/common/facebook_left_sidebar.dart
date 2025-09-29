@@ -54,9 +54,7 @@ class FacebookLeftSidebar extends StatelessWidget {
                   title: '收藏夹',
                   onTap: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const FavoritesPage(),
-                      ),
+                      MaterialPageRoute(builder: (_) => const FavoritesPage()),
                     );
                   },
                 ),
@@ -70,9 +68,7 @@ class FacebookLeftSidebar extends StatelessWidget {
                   title: '高级搜索',
                   onTap: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const SearchPage(),
-                      ),
+                      MaterialPageRoute(builder: (_) => const SearchPage()),
                     );
                   },
                 ),
@@ -91,9 +87,7 @@ class FacebookLeftSidebar extends StatelessWidget {
                   title: '导出数据',
                   onTap: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const ExportPage(),
-                      ),
+                      MaterialPageRoute(builder: (_) => const ExportPage()),
                     );
                   },
                 ),
@@ -181,70 +175,72 @@ class FacebookLeftSidebar extends StatelessWidget {
     VoidCallback? onTap,
     Widget? trailing,
   }) {
-    return LayoutBuilder(builder: (context, constraints) {
-      final compact = constraints.maxWidth < 160;
-      // 使用常量像素，避免在固定240px侧栏内被ScreenUtil放大导致溢出
-      final horizontalPadding = compact ? 8.0 : 12.0;
-      final verticalPadding = compact ? 8.0 : 12.0;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < 160;
+        // 使用常量像素，避免在固定240px侧栏内被ScreenUtil放大导致溢出
+        final horizontalPadding = compact ? 8.0 : 12.0;
+        final verticalPadding = compact ? 8.0 : 12.0;
 
-      return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
-        child: Material(
-          color: isActive
-              ? FacebookColors.primary.withValues(alpha: 0.1)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
-          child: InkWell(
-            onTap: onTap,
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+          child: Material(
+            color: isActive
+                ? FacebookColors.primary.withValues(alpha: 0.1)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: horizontalPadding,
-                vertical: verticalPadding,
-              ),
-              child: compact
-                  ? Center(
-                      child: Icon(
-                        icon,
-                        color: isActive
-                            ? FacebookColors.primary
-                            : FacebookColors.iconGray,
-                        size: 18.0,
-                      ),
-                    )
-                  : Row(
-                      children: [
-                        Icon(
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding,
+                  vertical: verticalPadding,
+                ),
+                child: compact
+                    ? Center(
+                        child: Icon(
                           icon,
                           color: isActive
                               ? FacebookColors.primary
                               : FacebookColors.iconGray,
-                          size: compact ? 18.0 : 20.0,
+                          size: 18.0,
                         ),
-                        const SizedBox(width: 12.0),
-                        Expanded(
-                          child: Text(
-                            title,
-                            style: FacebookTextStyles.bodyMedium.copyWith(
-                              color: isActive
-                                  ? FacebookColors.primary
-                                  : FacebookColors.textPrimary,
-                              fontWeight: isActive
-                                  ? FontWeight.w600
-                                  : FontWeight.normal,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
+                      )
+                    : Row(
+                        children: [
+                          Icon(
+                            icon,
+                            color: isActive
+                                ? FacebookColors.primary
+                                : FacebookColors.iconGray,
+                            size: compact ? 18.0 : 20.0,
                           ),
-                        ),
-                        if (trailing != null) trailing,
-                      ],
-                    ),
+                          const SizedBox(width: 12.0),
+                          Expanded(
+                            child: Text(
+                              title,
+                              style: FacebookTextStyles.bodyMedium.copyWith(
+                                color: isActive
+                                    ? FacebookColors.primary
+                                    : FacebookColors.textPrimary,
+                                fontWeight: isActive
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                          if (trailing != null) trailing,
+                        ],
+                      ),
+              ),
             ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 
   /// 构建底部信息

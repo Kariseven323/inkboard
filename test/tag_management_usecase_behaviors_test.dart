@@ -15,7 +15,9 @@ void main() {
     expect(bad.isFailure, isTrue);
 
     // 创建成功且去重校验
-    final ok1 = await uc.createTag(CreateTagParams(name: '编程', color: '#000000'));
+    final ok1 = await uc.createTag(
+      CreateTagParams(name: '编程', color: '#000000'),
+    );
     expect(ok1.isSuccess, isTrue);
     final ok2 = await uc.createTag(CreateTagParams(name: '生活'));
     expect(ok2.isSuccess, isTrue);
@@ -23,15 +25,21 @@ void main() {
     expect(dup.isFailure, isTrue);
 
     // 更新：不存在/重名/成功
-    final updateMissing = await uc.updateTag(UpdateTagParams(id: 999, name: 'X', color: '#fff'));
+    final updateMissing = await uc.updateTag(
+      UpdateTagParams(id: 999, name: 'X', color: '#fff'),
+    );
     expect(updateMissing.isFailure, isTrue);
 
     final id1 = ok1.dataOrThrow;
     // 第二个创建成功但此处无需使用其ID
-    final conflict = await uc.updateTag(UpdateTagParams(id: id1, name: '生活', color: '#fff'));
+    final conflict = await uc.updateTag(
+      UpdateTagParams(id: id1, name: '生活', color: '#fff'),
+    );
     expect(conflict.isFailure, isTrue);
 
-    final updateOK = await uc.updateTag(UpdateTagParams(id: id1, name: '编程1', color: '#333'));
+    final updateOK = await uc.updateTag(
+      UpdateTagParams(id: id1, name: '编程1', color: '#333'),
+    );
     expect(updateOK.isSuccess, isTrue);
 
     // 删除/批量删除成功（自定义标签）
@@ -39,7 +47,9 @@ void main() {
     expect(delBatchOK.isSuccess, isTrue);
 
     // 默认标签不可删
-    final defId = await repo.createTag(Tag(name: '工作', color: '#1877F2', createdAt: DateTime.now()));
+    final defId = await repo.createTag(
+      Tag(name: '工作', color: '#1877F2', createdAt: DateTime.now()),
+    );
     final delDefault = await uc.deleteTag(defId);
     expect(delDefault.isFailure, isTrue);
     final batchDefault = await uc.deleteTags([defId]);

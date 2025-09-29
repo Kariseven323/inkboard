@@ -73,7 +73,9 @@ class TagManagementPage extends ConsumerWidget {
       return Center(
         child: Text(
           '暂无标签',
-          style: FacebookTextStyles.bodyMedium.copyWith(color: FacebookColors.textSecondary),
+          style: FacebookTextStyles.bodyMedium.copyWith(
+            color: FacebookColors.textSecondary,
+          ),
         ),
       );
     }
@@ -92,7 +94,9 @@ class TagManagementPage extends ConsumerWidget {
               Text('使用 ${t.usageCount}'),
               IconButton(
                 icon: const Icon(Icons.delete_outline),
-                onPressed: t.isDefault ? null : () => _deleteTag(context, t.id!),
+                onPressed: t.isDefault
+                    ? null
+                    : () => _deleteTag(context, t.id!),
                 tooltip: t.isDefault ? '系统预设不可删' : '删除',
               ),
             ],
@@ -118,32 +122,51 @@ class TagManagementPage extends ConsumerWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: nameController, decoration: const InputDecoration(labelText: '名称')),
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: '名称'),
+            ),
             const SizedBox(height: 8),
-            TextField(controller: colorController, decoration: const InputDecoration(labelText: '颜色(HEX)')),
+            TextField(
+              controller: colorController,
+              decoration: const InputDecoration(labelText: '颜色(HEX)'),
+            ),
             const SizedBox(height: 8),
-            TextField(controller: descController, decoration: const InputDecoration(labelText: '描述(可选)')),
+            TextField(
+              controller: descController,
+              decoration: const InputDecoration(labelText: '描述(可选)'),
+            ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('取消')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('创建')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('创建'),
+          ),
         ],
       ),
     );
 
     if (ok == true) {
-      final result = await useCase.createTag(CreateTagParams(
-        name: nameController.text,
-        color: colorController.text,
-        description: descController.text.isEmpty ? null : descController.text,
-      ));
+      final result = await useCase.createTag(
+        CreateTagParams(
+          name: nameController.text,
+          color: colorController.text,
+          description: descController.text.isEmpty ? null : descController.text,
+        ),
+      );
 
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result.isSuccess ? '标签已创建' : (result.error ?? '创建失败')),
-          backgroundColor: result.isSuccess ? FacebookColors.success : FacebookColors.error,
+          backgroundColor: result.isSuccess
+              ? FacebookColors.success
+              : FacebookColors.error,
         ),
       );
     }
@@ -162,33 +185,52 @@ class TagManagementPage extends ConsumerWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: nameController, decoration: const InputDecoration(labelText: '名称')),
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: '名称'),
+            ),
             const SizedBox(height: 8),
-            TextField(controller: colorController, decoration: const InputDecoration(labelText: '颜色(HEX)')),
+            TextField(
+              controller: colorController,
+              decoration: const InputDecoration(labelText: '颜色(HEX)'),
+            ),
             const SizedBox(height: 8),
-            TextField(controller: descController, decoration: const InputDecoration(labelText: '描述(可选)')),
+            TextField(
+              controller: descController,
+              decoration: const InputDecoration(labelText: '描述(可选)'),
+            ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('取消')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('保存')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('保存'),
+          ),
         ],
       ),
     );
 
     if (ok == true) {
-      final result = await useCase.updateTag(UpdateTagParams(
-        id: tag.id!,
-        name: nameController.text,
-        color: colorController.text,
-        description: descController.text.isEmpty ? null : descController.text,
-      ));
+      final result = await useCase.updateTag(
+        UpdateTagParams(
+          id: tag.id!,
+          name: nameController.text,
+          color: colorController.text,
+          description: descController.text.isEmpty ? null : descController.text,
+        ),
+      );
 
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result.isSuccess ? '标签已更新' : (result.error ?? '更新失败')),
-          backgroundColor: result.isSuccess ? FacebookColors.success : FacebookColors.error,
+          backgroundColor: result.isSuccess
+              ? FacebookColors.success
+              : FacebookColors.error,
         ),
       );
     }
@@ -201,8 +243,14 @@ class TagManagementPage extends ConsumerWidget {
         title: const Text('删除标签'),
         content: const Text('确定删除该标签？此操作不可恢复'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('取消')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('删除')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('删除'),
+          ),
         ],
       ),
     );
@@ -213,7 +261,9 @@ class TagManagementPage extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result.isSuccess ? '已删除' : (result.error ?? '删除失败')),
-          backgroundColor: result.isSuccess ? FacebookColors.success : FacebookColors.error,
+          backgroundColor: result.isSuccess
+              ? FacebookColors.success
+              : FacebookColors.error,
         ),
       );
     }
@@ -237,4 +287,3 @@ class _ColorDot extends StatelessWidget {
     return CircleAvatar(radius: 10, backgroundColor: color);
   }
 }
-

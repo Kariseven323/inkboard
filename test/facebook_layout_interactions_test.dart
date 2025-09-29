@@ -16,11 +16,7 @@ void main() {
   });
 
   testWidgets('顶部图标悬停时背景变为输入背景色', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: InkboardApp(),
-      ),
-    );
+    await tester.pumpWidget(const ProviderScope(child: InkboardApp()));
     await tester.pump(const Duration(milliseconds: 300));
 
     final homeKey = const Key('nav_icon_home');
@@ -38,11 +34,7 @@ void main() {
   });
 
   testWidgets('搜索框聚焦后边框为主色且具有阴影', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: InkboardApp(),
-      ),
-    );
+    await tester.pumpWidget(const ProviderScope(child: InkboardApp()));
 
     await tester.pump(const Duration(milliseconds: 300));
 
@@ -76,11 +68,7 @@ void main() {
       tester.view.resetDevicePixelRatio();
     });
 
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: InkboardApp(),
-      ),
-    );
+    await tester.pumpWidget(const ProviderScope(child: InkboardApp()));
     await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.byType(FacebookLeftSidebar), findsNothing);
@@ -89,11 +77,7 @@ void main() {
     // 切换为桌面端尺寸（使用较温和的 DPR=1，避免极端缩放导致的布局约束异常）
     tester.view.devicePixelRatio = 1.0;
     tester.view.physicalSize = const Size(1920, 1200);
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: InkboardApp(),
-      ),
-    );
+    await tester.pumpWidget(const ProviderScope(child: InkboardApp()));
     await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.byType(FacebookLeftSidebar), findsWidgets);

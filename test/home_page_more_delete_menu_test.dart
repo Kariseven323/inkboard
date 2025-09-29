@@ -14,7 +14,12 @@ import 'package:inkboard/presentation/widgets/common/facebook_diary_card.dart';
 import 'fakes.dart';
 
 void main() {
-  Future<void> pumpUntilFound(WidgetTester tester, Finder finder, {int maxTicks = 60, Duration step = const Duration(milliseconds: 50)}) async {
+  Future<void> pumpUntilFound(
+    WidgetTester tester,
+    Finder finder, {
+    int maxTicks = 60,
+    Duration step = const Duration(milliseconds: 50),
+  }) async {
     for (var i = 0; i < maxTicks; i++) {
       if (finder.evaluate().isNotEmpty) return;
       await tester.pump(step);
@@ -32,33 +37,52 @@ void main() {
     getIt.registerSingleton<DeleteDiaryEntryUseCase>(deleteUc);
 
     final now = DateTime.now();
-    final entry = DiaryEntry(id: 31, title: '更多菜单删除项', content: 'c', createdAt: now, updatedAt: now, tags: [Tag(id: 1, name: '工作', color: '#1877F2', createdAt: now)]);
+    final entry = DiaryEntry(
+      id: 31,
+      title: '更多菜单删除项',
+      content: 'c',
+      createdAt: now,
+      updatedAt: now,
+      tags: [Tag(id: 1, name: '工作', color: '#1877F2', createdAt: now)],
+    );
     await entryRepo.createDiaryEntry(entry);
 
-    final override = diaryEntriesProvider.overrideWith((ref) => Stream.value([entry]));
+    final override = diaryEntriesProvider.overrideWith(
+      (ref) => Stream.value([entry]),
+    );
 
     tester.view.devicePixelRatio = 1.0;
     tester.view.physicalSize = const Size(390, 844);
-    addTearDown(() { tester.view.resetPhysicalSize(); tester.view.resetDevicePixelRatio(); });
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
 
     await tester.pumpWidget(
       ProviderScope(
         overrides: [override],
         child: ScreenUtilInit(
           designSize: const Size(390, 844),
-          builder: (context, _) => const MaterialApp(home: Scaffold(body: HomePage())),
+          builder: (context, _) =>
+              const MaterialApp(home: Scaffold(body: HomePage())),
         ),
       ),
     );
     await tester.pump(const Duration(milliseconds: 150));
 
     // 直接触发卡片的删除回调，等效于在“更多”菜单中点选“删除日记”
-    final card = tester.widgetList(find.byType(FacebookDiaryCard)).cast<FacebookDiaryCard>().first;
+    final card = tester
+        .widgetList(find.byType(FacebookDiaryCard))
+        .cast<FacebookDiaryCard>()
+        .first;
     card.onDeleteTap?.call();
     await tester.pump(const Duration(milliseconds: 100));
     final dialogFinder = find.byType(AlertDialog);
     await pumpUntilFound(tester, dialogFinder);
-    final deleteBtn = find.descendant(of: dialogFinder, matching: find.text('删除'));
+    final deleteBtn = find.descendant(
+      of: dialogFinder,
+      matching: find.text('删除'),
+    );
     await pumpUntilFound(tester, deleteBtn);
     await tester.tap(deleteBtn, warnIfMissed: false);
     await tester.pump(const Duration(milliseconds: 300));

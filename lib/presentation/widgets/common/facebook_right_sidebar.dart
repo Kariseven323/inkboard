@@ -28,34 +28,22 @@ class FacebookRightSidebar extends ConsumerWidget {
           const SizedBox(height: 24.0),
 
           // 常用标签
-          _buildSection(
-            title: '常用标签',
-            child: _buildTagsList(),
-          ),
+          _buildSection(title: '常用标签', child: _buildTagsList()),
 
           const SizedBox(height: 24.0),
 
           // 写作统计
-          _buildSection(
-            title: '写作统计',
-            child: _buildWritingStats(),
-          ),
+          _buildSection(title: '写作统计', child: _buildWritingStats()),
 
           const SizedBox(height: 24.0),
 
           // 写作提示
-          _buildSection(
-            title: '写作提示',
-            child: _buildWritingTips(),
-          ),
+          _buildSection(title: '写作提示', child: _buildWritingTips()),
 
           const SizedBox(height: 24.0),
 
           // 历史上的今天
-          _buildSection(
-            title: '历史上的今天',
-            child: _buildHistoryToday(),
-          ),
+          _buildSection(title: '历史上的今天', child: _buildHistoryToday()),
         ],
       ),
     );
@@ -70,10 +58,7 @@ class FacebookRightSidebar extends ConsumerWidget {
       decoration: BoxDecoration(
         color: FacebookColors.background,
         borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
-        border: Border.all(
-          color: FacebookColors.border,
-          width: 1,
-        ),
+        border: Border.all(color: FacebookColors.border, width: 1),
       ),
       child: Column(
         children: [
@@ -143,19 +128,11 @@ class FacebookRightSidebar extends ConsumerWidget {
   }
 
   /// 构建区块标题
-  Widget _buildSection({
-    required String title,
-    required Widget child,
-  }) {
+  Widget _buildSection({required String title, required Widget child}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: FacebookTextStyles.headline6.copyWith(
-            fontSize: 16,
-          ),
-        ),
+        Text(title, style: FacebookTextStyles.headline6.copyWith(fontSize: 16)),
         SizedBox(height: FacebookSizes.spacing12),
         child,
       ],
@@ -176,7 +153,10 @@ class FacebookRightSidebar extends ConsumerWidget {
               onTap: () {},
               borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8.0,
+                  horizontal: 4.0,
+                ),
                 child: Row(
                   children: [
                     Container(
@@ -189,10 +169,7 @@ class FacebookRightSidebar extends ConsumerWidget {
                     ),
                     const SizedBox(width: 8.0),
                     Expanded(
-                      child: Text(
-                        tag,
-                        style: FacebookTextStyles.bodySmall,
-                      ),
+                      child: Text(tag, style: FacebookTextStyles.bodySmall),
                     ),
                     Text(
                       '${(tags.indexOf(tag) + 1) * 3}',
@@ -215,10 +192,7 @@ class FacebookRightSidebar extends ConsumerWidget {
       decoration: BoxDecoration(
         color: FacebookColors.background,
         borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
-        border: Border.all(
-          color: FacebookColors.border,
-          width: 1,
-        ),
+        border: Border.all(color: FacebookColors.border, width: 1),
       ),
       child: Column(
         children: const [
@@ -239,11 +213,7 @@ class FacebookRightSidebar extends ConsumerWidget {
 
   /// 构建写作提示
   Widget _buildWritingTips() {
-    final tips = [
-      '今天有什么让你印象深刻的事情吗？',
-      '尝试描述一下今天的心情变化',
-      '记录一下今天学到的新知识',
-    ];
+    final tips = ['今天有什么让你印象深刻的事情吗？', '尝试描述一下今天的心情变化', '记录一下今天学到的新知识'];
 
     return Column(
       children: tips.map((tip) {
@@ -341,13 +311,17 @@ class FacebookRightSidebar extends ConsumerWidget {
       ),
     );
   }
-} 
+}
 
 class _StatRow extends StatelessWidget {
   final String label;
   final String value;
   final String unit;
-  const _StatRow({required this.label, required this.value, required this.unit});
+  const _StatRow({
+    required this.label,
+    required this.value,
+    required this.unit,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -356,16 +330,18 @@ class _StatRow extends StatelessWidget {
       children: [
         Text(label, style: FacebookTextStyles.bodySmall),
         RichText(
-          text: TextSpan(children: [
-            TextSpan(
-              text: value,
-              style: FacebookTextStyles.bodyMedium.copyWith(
-                fontWeight: FontWeight.bold,
-                color: FacebookColors.primary,
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: value,
+                style: FacebookTextStyles.bodyMedium.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: FacebookColors.primary,
+                ),
               ),
-            ),
-            TextSpan(text: ' $unit', style: FacebookTextStyles.caption),
-          ]),
+              TextSpan(text: ' $unit', style: FacebookTextStyles.caption),
+            ],
+          ),
         ),
       ],
     );

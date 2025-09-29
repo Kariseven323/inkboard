@@ -10,19 +10,31 @@ import 'package:inkboard/presentation/providers/diary_provider.dart';
 void main() {
   testWidgets('HomePage 删除对话框取消', (tester) async {
     final now = DateTime.now();
-    final entry = DiaryEntry(id: 11, title: '取消删除项', content: 'c', createdAt: now, updatedAt: now);
-    final override = diaryEntriesProvider.overrideWith((ref) => Stream.value([entry]));
+    final entry = DiaryEntry(
+      id: 11,
+      title: '取消删除项',
+      content: 'c',
+      createdAt: now,
+      updatedAt: now,
+    );
+    final override = diaryEntriesProvider.overrideWith(
+      (ref) => Stream.value([entry]),
+    );
 
     tester.view.devicePixelRatio = 1.0;
     tester.view.physicalSize = const Size(390, 844);
-    addTearDown(() { tester.view.resetPhysicalSize(); tester.view.resetDevicePixelRatio(); });
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
 
     await tester.pumpWidget(
       ProviderScope(
         overrides: [override],
         child: ScreenUtilInit(
           designSize: const Size(390, 844),
-          builder: (context, _) => const MaterialApp(home: Scaffold(body: HomePage())),
+          builder: (context, _) =>
+              const MaterialApp(home: Scaffold(body: HomePage())),
         ),
       ),
     );

@@ -27,4 +27,3 @@ void main() {
     expect(chip.selected, isTrue);
   });
 }
-

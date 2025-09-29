@@ -15,10 +15,7 @@ class SearchServiceImpl implements SearchService {
   // 简单的搜索历史存储（实际项目中可能需要持久化）
   final List<String> _searchHistory = [];
 
-  SearchServiceImpl(
-    this._diaryEntryRepository,
-    this._tagRepository,
-  );
+  SearchServiceImpl(this._diaryEntryRepository, this._tagRepository);
 
   @override
   Future<List<SearchResult>> globalSearch(String query) async {
@@ -27,25 +24,34 @@ class SearchServiceImpl implements SearchService {
     final results = <SearchResult>[];
 
     // 搜索日记条目
-    final diaryEntries = await _diaryEntryRepository.searchDiaryEntries(query).first;
+    final diaryEntries = await _diaryEntryRepository
+        .searchDiaryEntries(query)
+        .first;
     for (final entry in diaryEntries) {
-      results.add(SearchResult(
-        type: SearchResultType.diaryEntry,
-        data: entry,
-        snippet: _generateSnippet(entry, query),
-        relevanceScore: _calculateRelevanceScore(entry, query),
-      ));
+      results.add(
+        SearchResult(
+          type: SearchResultType.diaryEntry,
+          data: entry,
+          snippet: _generateSnippet(entry, query),
+          relevanceScore: _calculateRelevanceScore(entry, query),
+        ),
+      );
     }
 
     // 搜索标签
     final tags = await _tagRepository.searchTags(query).first;
     for (final tag in tags) {
-      results.add(SearchResult(
-        type: SearchResultType.tag,
-        data: tag,
-        snippet: tag.description ?? tag.name,
-        relevanceScore: _calculateTextRelevanceScore('${tag.name} ${tag.description ?? ''}', query),
-      ));
+      results.add(
+        SearchResult(
+          type: SearchResultType.tag,
+          data: tag,
+          snippet: tag.description ?? tag.name,
+          relevanceScore: _calculateTextRelevanceScore(
+            '${tag.name} ${tag.description ?? ''}',
+            query,
+          ),
+        ),
+      );
     }
 
     // 按相关性排序
@@ -78,7 +84,8 @@ class SearchServiceImpl implements SearchService {
     int? moodScore,
   }) {
     // 开始从所有日记条目进行筛选
-    Stream<List<DiaryEntry>> stream = _diaryEntryRepository.getAllDiaryEntries();
+    Stream<List<DiaryEntry>> stream = _diaryEntryRepository
+        .getAllDiaryEntries();
 
     // 应用各种筛选条件
     stream = stream.map((entries) {
@@ -92,14 +99,19 @@ class SearchServiceImpl implements SearchService {
 
         // 内容搜索
         if (contentQuery != null && contentQuery.isNotEmpty) {
-          if (!entry.content.toLowerCase().contains(contentQuery.toLowerCase())) {
+          if (!entry.content.toLowerCase().contains(
+            contentQuery.toLowerCase(),
+          )) {
             return false;
           }
         }
 
         // 标签筛选
         if (tagIds != null && tagIds.isNotEmpty) {
-          final entryTagIds = entry.tags.map((tag) => tag.id).whereType<int>().toSet();
+          final entryTagIds = entry.tags
+              .map((tag) => tag.id)
+              .whereType<int>()
+              .toSet();
           if (!tagIds.any((tagId) => entryTagIds.contains(tagId))) {
             return false;
           }
@@ -143,7 +155,7 @@ class SearchServiceImpl implements SearchService {
     // 从搜索历史中获取建议
     final history = await getSearchHistory();
     suggestions.addAll(
-      history.where((term) => term.toLowerCase().contains(query.toLowerCase()))
+      history.where((term) => term.toLowerCase().contains(query.toLowerCase())),
     );
 
     // 去重并限制数量
@@ -184,7 +196,11 @@ class SearchServiceImpl implements SearchService {
   }
 
   /// 生成搜索片段
-  String _generateSnippet(DiaryEntry entry, String query, {int maxLength = 150}) {
+  String _generateSnippet(
+    DiaryEntry entry,
+    String query, {
+    int maxLength = 150,
+  }) {
     final lowerQuery = query.toLowerCase();
     final title = entry.title;
     final content = entry.content;
@@ -198,11 +214,16 @@ class SearchServiceImpl implements SearchService {
     // 再从内容匹配片段
     final idx = content.toLowerCase().indexOf(lowerQuery);
     if (idx == -1) {
-      return content.length <= maxLength ? content : '${content.substring(0, maxLength - 3)}...';
+      return content.length <= maxLength
+          ? content
+          : '${content.substring(0, maxLength - 3)}...';
     }
 
     final start = (idx - maxLength ~/ 4).clamp(0, content.length);
-    final end = (idx + lowerQuery.length + maxLength ~/ 4 * 3).clamp(0, content.length);
+    final end = (idx + lowerQuery.length + maxLength ~/ 4 * 3).clamp(
+      0,
+      content.length,
+    );
     var snippet = content.substring(start, end);
     if (start > 0) snippet = '...$snippet';
     if (end < content.length) snippet = '$snippet...';
@@ -238,8 +259,10 @@ class SearchServiceImpl implements SearchService {
     final days = DateTime.now().difference(entry.createdAt).inDays;
     final timeFactor = 1.0 / (1.0 + days / 30.0);
 
-    final titleScore = (titleFreq * 5.0 + titlePos / 50.0) / lenPenalty(lt) * 2.0;
-    final contentScore = (contentFreq * 3.0 + contentPos / 100.0) / lenPenalty(lc) * 1.0;
+    final titleScore =
+        (titleFreq * 5.0 + titlePos / 50.0) / lenPenalty(lt) * 2.0;
+    final contentScore =
+        (contentFreq * 3.0 + contentPos / 100.0) / lenPenalty(lc) * 1.0;
 
     return (titleScore + contentScore) * timeFactor;
   }
@@ -255,12 +278,24 @@ class SearchServiceImpl implements SearchService {
     return (f * 3.0 + posScore / 100.0) / lenPenalty;
   }
 
-  String _highlight(String text, String lowerQuery, {int maxLength = 150, bool isTitle = false}) {
+  String _highlight(
+    String text,
+    String lowerQuery, {
+    int maxLength = 150,
+    bool isTitle = false,
+  }) {
     final idx = text.toLowerCase().indexOf(lowerQuery);
-    if (idx < 0) return text.length <= maxLength ? text : '${text.substring(0, maxLength - 3)}...';
+    if (idx < 0) {
+      return text.length <= maxLength
+          ? text
+          : '${text.substring(0, maxLength - 3)}...';
+    }
     if (isTitle) return _applyHighlight(text, lowerQuery);
     final start = (idx - maxLength ~/ 4).clamp(0, text.length);
-    final end = (idx + lowerQuery.length + maxLength ~/ 4 * 3).clamp(0, text.length);
+    final end = (idx + lowerQuery.length + maxLength ~/ 4 * 3).clamp(
+      0,
+      text.length,
+    );
     var snippet = text.substring(start, end);
     if (start > 0) snippet = '...$snippet';
     if (end < text.length) snippet = '$snippet...';

@@ -54,9 +54,8 @@ void main() {
         overrides: [providerOverride],
         child: ScreenUtilInit(
           designSize: const Size(390, 844),
-          builder: (context, _) => const MaterialApp(
-            home: FacebookLayout(child: HomePage()),
-          ),
+          builder: (context, _) =>
+              const MaterialApp(home: FacebookLayout(child: HomePage())),
         ),
       ),
     );

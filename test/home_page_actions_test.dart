@@ -31,7 +31,9 @@ void main() {
     final tagRepo = InMemoryTagRepository();
     final newId = await entryRepo.createDiaryEntry(entry);
     entry = entry.copyWith(id: newId);
-    final listOverride = diaryEntriesProvider.overrideWith((ref) => Stream.value([entry]));
+    final listOverride = diaryEntriesProvider.overrideWith(
+      (ref) => Stream.value([entry]),
+    );
     final updateUsecase = UpdateDiaryEntryUseCase(entryRepo, tagRepo);
     final deleteUsecase = DeleteDiaryEntryUseCase(entryRepo, tagRepo);
     getIt.registerSingleton<UpdateDiaryEntryUseCase>(updateUsecase);
@@ -49,7 +51,8 @@ void main() {
         overrides: [listOverride],
         child: ScreenUtilInit(
           designSize: const Size(390, 844),
-          builder: (context, _) => const MaterialApp(home: Scaffold(body: HomePage())),
+          builder: (context, _) =>
+              const MaterialApp(home: Scaffold(body: HomePage())),
         ),
       ),
     );

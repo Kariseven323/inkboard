@@ -39,10 +39,11 @@ extension GetItInjectableX on _i174.GetIt {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     gh.factory<_i639.AppConfigService>(() => _i639.AppConfigService());
     gh.lazySingleton<_i901.DatabaseKeyService>(
-        () => _i902.SecureDatabaseKeyService());
-    gh.lazySingleton<_i160.AppDatabase>(() => _i160.AppDatabase(
-          keyService: gh<_i901.DatabaseKeyService>(),
-        ));
+      () => _i902.SecureDatabaseKeyService(),
+    );
+    gh.lazySingleton<_i160.AppDatabase>(
+      () => _i160.AppDatabase(keyService: gh<_i901.DatabaseKeyService>()),
+    );
     // SearchResult 为值对象，不注册工厂以避免泛型边界问题
     gh.lazySingleton<_i13.EncryptionService>(
       () => _i608.EncryptionServiceImpl(),

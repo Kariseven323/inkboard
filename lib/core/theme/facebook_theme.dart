@@ -37,10 +37,7 @@ class FacebookTheme {
         elevation: FacebookSizes.cardElevation,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
-          side: const BorderSide(
-            color: FacebookColors.border,
-            width: 1,
-          ),
+          side: const BorderSide(color: FacebookColors.border, width: 1),
         ),
         margin: FacebookSizes.marginVertical,
       ),
@@ -65,10 +62,7 @@ class FacebookTheme {
           foregroundColor: FacebookColors.primary,
           minimumSize: Size(0, FacebookSizes.buttonHeightMedium),
           padding: FacebookSizes.paddingHorizontal,
-          side: const BorderSide(
-            color: FacebookColors.border,
-            width: 1,
-          ),
+          side: const BorderSide(color: FacebookColors.border, width: 1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(FacebookSizes.radiusMedium),
           ),
@@ -112,17 +106,11 @@ class FacebookTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(FacebookSizes.radiusRound),
-          borderSide: const BorderSide(
-            color: FacebookColors.primary,
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: FacebookColors.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(FacebookSizes.radiusRound),
-          borderSide: const BorderSide(
-            color: FacebookColors.error,
-            width: 1,
-          ),
+          borderSide: const BorderSide(color: FacebookColors.error, width: 1),
         ),
         contentPadding: EdgeInsets.symmetric(
           horizontal: FacebookSizes.spacing16,
@@ -235,18 +223,10 @@ class FacebookTheme {
       tabBarTheme: const TabBarThemeData(
         labelColor: FacebookColors.primary,
         unselectedLabelColor: FacebookColors.textSecondary,
-        labelStyle: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        ),
-        unselectedLabelStyle: TextStyle(
-          fontSize: 14,
-        ),
+        labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        unselectedLabelStyle: TextStyle(fontSize: 14),
         indicator: UnderlineTabIndicator(
-          borderSide: BorderSide(
-            color: FacebookColors.primary,
-            width: 2,
-          ),
+          borderSide: BorderSide(color: FacebookColors.primary, width: 2),
         ),
       ),
 
@@ -275,10 +255,7 @@ class FacebookTheme {
           return FacebookColors.surface;
         }),
         checkColor: WidgetStateProperty.all(FacebookColors.textOnPrimary),
-        side: const BorderSide(
-          color: FacebookColors.border,
-          width: 1,
-        ),
+        side: const BorderSide(color: FacebookColors.border, width: 1),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(FacebookSizes.radiusSmall),
         ),
@@ -304,9 +281,7 @@ class FacebookTheme {
     return lightTheme.copyWith(
       colorScheme: darkColorScheme,
       scaffoldBackgroundColor: const Color(0xFF18191A),
-      cardTheme: lightTheme.cardTheme.copyWith(
-        color: const Color(0xFF242526),
-      ),
+      cardTheme: lightTheme.cardTheme.copyWith(color: const Color(0xFF242526)),
       appBarTheme: lightTheme.appBarTheme.copyWith(
         backgroundColor: const Color(0xFF242526),
       ),

@@ -17,11 +17,7 @@ void main() {
   // 初始化应用配置服务
   getIt<AppConfigService>().init();
 
-  runApp(
-    ProviderScope(
-      child: const InkboardApp(),
-    ),
-  );
+  runApp(ProviderScope(child: const InkboardApp()));
 }
 
 class InkboardApp extends ConsumerWidget {
@@ -49,9 +45,7 @@ class InkboardApp extends ConsumerWidget {
               child: child ?? const SizedBox.shrink(),
             );
           },
-          home: const FacebookLayout(
-            child: HomePage(),
-          ),
+          home: const FacebookLayout(child: HomePage()),
           debugShowCheckedModeBanner: false,
         );
       },

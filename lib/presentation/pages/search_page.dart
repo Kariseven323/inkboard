@@ -13,22 +13,28 @@ import '../widgets/common/facebook_diary_card.dart';
 import '../../domain/usecases/update_delete_diary_entry_usecase.dart';
 
 /// 搜索结果Provider（基于查询词）
-final searchResultsProvider = FutureProvider.family<List<SearchResult>, String>((ref, query) async {
-  final useCase = getIt<SearchDiaryUseCase>();
-  final result = await useCase.globalSearch(query);
-  return result.dataOrThrow;
-});
+final searchResultsProvider = FutureProvider.family<List<SearchResult>, String>(
+  (ref, query) async {
+    final useCase = getIt<SearchDiaryUseCase>();
+    final result = await useCase.globalSearch(query);
+    return result.dataOrThrow;
+  },
+);
 
 /// 高级搜索结果Provider（基于参数）
 /// 使用 FutureProvider 取首个快照，避免某些测试环境下 Stream 懒订阅而不触发首帧的问题
-final advancedSearchProvider = FutureProvider.family<List<DiaryEntry>, AdvancedSearchParams>((ref, params) async {
-  final useCase = getIt<SearchDiaryUseCase>();
-  // 测试注入的错误流场景：当查询词为特定值时，首帧即抛错，便于UI稳定呈现错误态
-  if ((params.titleQuery ?? '').trim() == 'x') {
-    throw Exception('BAD_STREAM');
-  }
-  return await useCase.advancedSearch(params).first;
-});
+final advancedSearchProvider =
+    FutureProvider.family<List<DiaryEntry>, AdvancedSearchParams>((
+      ref,
+      params,
+    ) async {
+      final useCase = getIt<SearchDiaryUseCase>();
+      // 测试注入的错误流场景：当查询词为特定值时，首帧即抛错，便于UI稳定呈现错误态
+      if ((params.titleQuery ?? '').trim() == 'x') {
+        throw Exception('BAD_STREAM');
+      }
+      return await useCase.advancedSearch(params).first;
+    });
 
 class SearchPage extends ConsumerStatefulWidget {
   final String initialQuery;
@@ -79,9 +85,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         children: [
           if (_showAdvanced) _buildAdvancedFilters(context),
           Expanded(
-            child: query.isEmpty
-                ? _buildEmptyState()
-                : _buildResults(query),
+            child: query.isEmpty ? _buildEmptyState() : _buildResults(query),
           ),
         ],
       ),
@@ -167,15 +171,24 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         isFavorite: _onlyFavorite ? true : null,
       );
       final asyncEntries = ref.watch(advancedSearchProvider(params));
-      assert(() { debugPrint('[SearchPage] advanced mode on, query=$query'); return true; }());
+      assert(() {
+        debugPrint('[SearchPage] advanced mode on, query=$query');
+        return true;
+      }());
       return asyncEntries.when(
         data: (entries) {
-          assert(() { debugPrint('[SearchPage] advanced entries=${entries.length}'); return true; }());
+          assert(() {
+            debugPrint('[SearchPage] advanced entries=${entries.length}');
+            return true;
+          }());
           return _buildDiaryEntries(entries);
         },
         loading: () => _buildLoading(),
         error: (e, st) {
-          assert(() { debugPrint('[SearchPage] advanced error=${e.toString()}'); return true; }());
+          assert(() {
+            debugPrint('[SearchPage] advanced error=${e.toString()}');
+            return true;
+          }());
           return _buildError(e.toString());
         },
       );
@@ -206,10 +219,15 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             return _SearchResultDiaryCard(entry: entry, snippet: r.snippet);
           case SearchResultType.tag:
             final tag = r.data as Tag;
-            assert(() { return true; }());
+            assert(() {
+              return true;
+            }());
             return ListTile(
               leading: const Icon(Icons.local_offer_outlined),
-              title: Text(tag.name, key: ValueKey('tag_title_${tag.id ?? tag.name}')),
+              title: Text(
+                tag.name,
+                key: ValueKey('tag_title_${tag.id ?? tag.name}'),
+              ),
               subtitle: Text(r.snippet),
             );
         }
@@ -220,53 +238,58 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   Widget _buildDiaryEntries(List<DiaryEntry> entries) {
-    assert(() { debugPrint('[SearchPage] build diary entries len=${entries.length}'); return true; }());
+    assert(() {
+      debugPrint('[SearchPage] build diary entries len=${entries.length}');
+      return true;
+    }());
     if (entries.isEmpty) return _buildEmptyList('没有符合条件的日记');
 
     return ListView(
       padding: EdgeInsets.all(FacebookSizes.spacing16),
       children: entries
-          .map((e) => FacebookDiaryCard(
-                title: e.title,
-                content: e.content,
-                createdAt: e.createdAt,
-                tags: e.tags.map((t) => t.name).toList(),
-                isFavorite: e.isFavorite,
-                onTap: () {},
-                onFavoriteTap: () {},
-                onEditTap: () {},
-                onDeleteTap: () {},
-                onShareTap: () {},
-              ))
+          .map(
+            (e) => FacebookDiaryCard(
+              title: e.title,
+              content: e.content,
+              createdAt: e.createdAt,
+              tags: e.tags.map((t) => t.name).toList(),
+              isFavorite: e.isFavorite,
+              onTap: () {},
+              onFavoriteTap: () {},
+              onEditTap: () {},
+              onDeleteTap: () {},
+              onShareTap: () {},
+            ),
+          )
           .toList(),
     );
   }
 
   Widget _buildLoading() => const Center(child: CircularProgressIndicator());
 
-  Widget _buildError(String error) => Center(
-        child: Text(
-          error,
-          style: FacebookTextStyles.bodyMedium,
-        ),
-      );
+  Widget _buildError(String error) =>
+      Center(child: Text(error, style: FacebookTextStyles.bodyMedium));
 
   Widget _buildEmptyState() => Center(
-        child: Text(
-          '输入关键词开始搜索',
-          style: FacebookTextStyles.bodyMedium.copyWith(color: FacebookColors.textSecondary),
-        ),
-      );
+    child: Text(
+      '输入关键词开始搜索',
+      style: FacebookTextStyles.bodyMedium.copyWith(
+        color: FacebookColors.textSecondary,
+      ),
+    ),
+  );
 
   Widget _buildEmptyList(String message) => Center(
-        child: Padding(
-          padding: FacebookSizes.paddingAll,
-          child: Text(
-            message,
-            style: FacebookTextStyles.bodyMedium.copyWith(color: FacebookColors.textSecondary),
-          ),
+    child: Padding(
+      padding: FacebookSizes.paddingAll,
+      child: Text(
+        message,
+        style: FacebookTextStyles.bodyMedium.copyWith(
+          color: FacebookColors.textSecondary,
         ),
-      );
+      ),
+    ),
+  );
 }
 
 /// 搜索结果中的日记卡片，附带片段
@@ -320,13 +343,20 @@ class _HighlightedText extends StatelessWidget {
     final spans = <TextSpan>[];
     for (var i = 0; i < parts.length; i++) {
       final isBold = i % 2 == 1;
-      spans.add(TextSpan(
-        text: parts[i],
-        style: isBold
-            ? const TextStyle(fontWeight: FontWeight.w600, color: FacebookColors.textPrimary)
-            : const TextStyle(color: FacebookColors.textSecondary),
-      ));
+      spans.add(
+        TextSpan(
+          text: parts[i],
+          style: isBold
+              ? const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: FacebookColors.textPrimary,
+                )
+              : const TextStyle(color: FacebookColors.textSecondary),
+        ),
+      );
     }
-    return RichText(text: TextSpan(style: FacebookTextStyles.bodySmall, children: spans));
+    return RichText(
+      text: TextSpan(style: FacebookTextStyles.bodySmall, children: spans),
+    );
   }
 }

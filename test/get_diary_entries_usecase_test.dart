@@ -11,8 +11,25 @@ void main() {
     final repo = InMemoryDiaryEntryRepository();
     final uc = GetDiaryEntriesUseCase(repo);
     final now = DateTime.now();
-    await repo.createDiaryEntry(DiaryEntry(id: 1, title: 'A', content: 'a', createdAt: now, updatedAt: now));
-    await repo.createDiaryEntry(DiaryEntry(id: 2, title: 'B', content: 'b', createdAt: now, updatedAt: now, isFavorite: true));
+    await repo.createDiaryEntry(
+      DiaryEntry(
+        id: 1,
+        title: 'A',
+        content: 'a',
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
+    await repo.createDiaryEntry(
+      DiaryEntry(
+        id: 2,
+        title: 'B',
+        content: 'b',
+        createdAt: now,
+        updatedAt: now,
+        isFavorite: true,
+      ),
+    );
 
     // 全量
     final all = await uc.getAllEntries().first;
@@ -21,10 +38,17 @@ void main() {
     final fav = await uc.getFavoriteEntries().first;
     expect(fav.length, 1);
     // 日期范围
-    final byDate = await uc.getEntriesByDateRange(now.subtract(const Duration(days: 1)), now.add(const Duration(days: 1))).first;
+    final byDate = await uc
+        .getEntriesByDateRange(
+          now.subtract(const Duration(days: 1)),
+          now.add(const Duration(days: 1)),
+        )
+        .first;
     expect(byDate.length, 2);
     // 按标签（给一条加上id=1标签）
-    final tagged = all.first.copyWith(tags: [Tag(id: 1, name: 'T1', color: '#1877F2', createdAt: now)]);
+    final tagged = all.first.copyWith(
+      tags: [Tag(id: 1, name: 'T1', color: '#1877F2', createdAt: now)],
+    );
     await repo.updateDiaryEntry(tagged);
     final byTags = await uc.getEntriesByTags(const [1]).first;
     expect(byTags.length, 1);

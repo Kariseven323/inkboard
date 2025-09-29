@@ -27,7 +27,9 @@ void main() {
       ),
     ];
 
-    final override = favoriteDiaryEntriesProvider.overrideWith((ref) => Stream.value(entries));
+    final override = favoriteDiaryEntriesProvider.overrideWith(
+      (ref) => Stream.value(entries),
+    );
 
     await tester.pumpWidget(
       ProviderScope(
@@ -45,7 +47,9 @@ void main() {
   });
 
   testWidgets('FavoritesPage 空态渲染', (tester) async {
-    final emptyOverride = favoriteDiaryEntriesProvider.overrideWith((ref) => Stream<List<DiaryEntry>>.value(const []));
+    final emptyOverride = favoriteDiaryEntriesProvider.overrideWith(
+      (ref) => Stream<List<DiaryEntry>>.value(const []),
+    );
 
     await tester.pumpWidget(
       ProviderScope(
@@ -61,7 +65,9 @@ void main() {
   });
 
   testWidgets('FavoritesPage 错误状态渲染', (tester) async {
-    final errorOverride = favoriteDiaryEntriesProvider.overrideWith((ref) => Stream<List<DiaryEntry>>.error('OOPS'));
+    final errorOverride = favoriteDiaryEntriesProvider.overrideWith(
+      (ref) => Stream<List<DiaryEntry>>.error('OOPS'),
+    );
 
     await tester.pumpWidget(
       ProviderScope(
@@ -79,7 +85,9 @@ void main() {
   testWidgets('FavoritesPage 加载状态渲染', (tester) async {
     final ctrl = StreamController<List<DiaryEntry>>();
     addTearDown(() => ctrl.close());
-    final loadingOverride = favoriteDiaryEntriesProvider.overrideWith((ref) => ctrl.stream);
+    final loadingOverride = favoriteDiaryEntriesProvider.overrideWith(
+      (ref) => ctrl.stream,
+    );
 
     await tester.pumpWidget(
       ProviderScope(
@@ -105,7 +113,9 @@ void main() {
       isFavorite: true,
       tags: [Tag(id: 1, name: '工作', color: '#1877F2', createdAt: now)],
     );
-    final override = favoriteDiaryEntriesProvider.overrideWith((ref) => Stream.value([entry]));
+    final override = favoriteDiaryEntriesProvider.overrideWith(
+      (ref) => Stream.value([entry]),
+    );
 
     // 准备仓储与用例
     final entryRepo = InMemoryDiaryEntryRepository();
