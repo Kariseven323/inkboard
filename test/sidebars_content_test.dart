@@ -31,11 +31,12 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.text('主页'), findsOneWidget);
-    expect(find.text('我的日记'), findsOneWidget);
     expect(find.text('标签管理'), findsOneWidget);
     expect(find.text('收藏夹'), findsOneWidget);
     expect(find.text('统计分析'), findsOneWidget);
-    expect(find.text('高级搜索'), findsOneWidget);
+    // 已去除：我的日记、高级搜索
+    expect(find.text('我的日记'), findsNothing);
+    expect(find.text('高级搜索'), findsNothing);
 
     // 底部信息包含版本号与版权
     expect(find.text('砚记 v1.0.0'), findsOneWidget);

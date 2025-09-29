@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:inkboard/presentation/widgets/common/facebook_left_sidebar.dart';
 
 void main() {
-  testWidgets('FacebookLeftSidebar 导航至 标签管理/收藏夹/高级搜索/导出', (tester) async {
+  testWidgets('FacebookLeftSidebar 导航至 标签管理/收藏夹/设置/导出', (tester) async {
     await tester.pumpWidget(
       const ProviderScope(
         child: ScreenUtilInit(
@@ -37,10 +37,10 @@ void main() {
     await tester.pageBack();
     await tester.pumpAndSettle();
 
-    // 高级搜索
-    await tester.tap(find.text('高级搜索'));
+    // 设置
+    await tester.tap(find.text('设置'));
     await tester.pumpAndSettle();
-    expect(find.text('输入关键词开始搜索'), findsWidgets);
+    expect(find.text('设置'), findsWidgets);
     await tester.pageBack();
     await tester.pumpAndSettle();
 

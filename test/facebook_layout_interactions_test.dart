@@ -15,22 +15,13 @@ void main() {
     configureDependencies();
   });
 
-  testWidgets('顶部图标悬停时背景变为输入背景色', (WidgetTester tester) async {
+  testWidgets('顶部不应存在主页/通知/设置图标', (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: InkboardApp()));
     await tester.pump(const Duration(milliseconds: 300));
 
-    final homeKey = const Key('nav_icon_home');
-    expect(find.byKey(homeKey), findsOneWidget);
-
-    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
-    await gesture.addPointer();
-    final center = tester.getCenter(find.byKey(homeKey));
-    await gesture.moveTo(center);
-    await tester.pump(const Duration(milliseconds: 300));
-
-    final animated = tester.widget<AnimatedContainer>(find.byKey(homeKey));
-    final decoration = animated.decoration as BoxDecoration;
-    expect(decoration.color, equals(FacebookColors.inputBackground));
+    expect(find.byKey(const Key('nav_icon_home')), findsNothing);
+    expect(find.byKey(const Key('nav_icon_notifications')), findsNothing);
+    expect(find.byKey(const Key('nav_icon_settings')), findsNothing);
   });
 
   testWidgets('搜索框聚焦后边框为主色且具有阴影', (WidgetTester tester) async {

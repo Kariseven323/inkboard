@@ -49,66 +49,12 @@ class FacebookLayout extends StatelessWidget {
       elevation: 0,
       toolbarHeight: FacebookSizes.navBarHeight,
       centerTitle: false,
-      title: Row(
+      title: const Row(
         children: [
-          // Facebook logo
-          // Facebook Logo（蓝底白 f 文字符号，避免重复Icon匹配）
-          Container(
-            width: 32.w,
-            height: 32.w,
-            decoration: const BoxDecoration(
-              color: FacebookColors.textOnPrimary,
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: const Text(
-              'f',
-              key: Key('appbar_fb_icon'),
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w900,
-                color: FacebookColors.primary,
-                height: 1,
-              ),
-            ),
-          ),
-          SizedBox(width: FacebookSizes.spacing12),
-
-          // 搜索框（提取为可悬停/聚焦的组件）
-          const Expanded(child: _NavSearchField()),
+          // 仅保留搜索框
+          Expanded(child: _NavSearchField()),
         ],
       ),
-      actions: [
-        // 右侧图标按钮（36px圆形，悬停#F0F2F5）
-        _fbIconButton(
-          Icons.home_outlined,
-          () {},
-          key: const Key('nav_icon_home'),
-        ),
-        _fbIconButton(
-          Icons.notifications_outlined,
-          () {},
-          key: const Key('nav_icon_notifications'),
-        ),
-        _fbIconButton(Icons.settings_outlined, () {
-          Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => const SettingsPage()));
-        }, key: const Key('nav_icon_settings')),
-        SizedBox(width: FacebookSizes.spacing8),
-
-        // 用户头像
-        CircleAvatar(
-          radius: FacebookSizes.avatarSmall / 2,
-          backgroundColor: FacebookColors.textOnPrimary,
-          child: Icon(
-            Icons.person,
-            color: FacebookColors.primary,
-            size: FacebookSizes.iconMedium,
-          ),
-        ),
-        SizedBox(width: FacebookSizes.spacing12),
-      ],
     );
   }
 

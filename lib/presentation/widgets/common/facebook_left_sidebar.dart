@@ -4,8 +4,8 @@ import '../../../core/theme/facebook_sizes.dart';
 import '../../../core/theme/facebook_text_styles.dart';
 import '../../pages/tag_management_page.dart';
 import '../../pages/favorites_page.dart';
-import '../../pages/search_page.dart';
 import '../../pages/export_page.dart';
+import '../../pages/settings_page.dart';
 
 /// Facebook风格的左侧导航栏
 class FacebookLeftSidebar extends StatelessWidget {
@@ -20,7 +20,7 @@ class FacebookLeftSidebar extends StatelessWidget {
       child: Column(
         children: [
           // 顶部用户信息
-          _buildUserProfile(),
+          _buildUserProfile(context),
 
           // 导航菜单
           Expanded(
@@ -31,11 +31,6 @@ class FacebookLeftSidebar extends StatelessWidget {
                   icon: Icons.home_outlined,
                   title: '主页',
                   isActive: true,
-                  onTap: () {},
-                ),
-                _buildNavigationItem(
-                  icon: Icons.edit_note_outlined,
-                  title: '我的日记',
                   onTap: () {},
                 ),
                 _buildNavigationItem(
@@ -63,15 +58,6 @@ class FacebookLeftSidebar extends StatelessWidget {
                   title: '统计分析',
                   onTap: () {},
                 ),
-                _buildNavigationItem(
-                  icon: Icons.search_outlined,
-                  title: '高级搜索',
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const SearchPage()),
-                    );
-                  },
-                ),
 
                 // 分割线
                 Divider(
@@ -94,7 +80,11 @@ class FacebookLeftSidebar extends StatelessWidget {
                 _buildNavigationItem(
                   icon: Icons.settings_outlined,
                   title: '设置',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const SettingsPage()),
+                    );
+                  },
                 ),
 
                 // 底部信息移入可滚动区域，避免整体高度溢出
@@ -111,20 +101,28 @@ class FacebookLeftSidebar extends StatelessWidget {
   }
 
   /// 构建用户资料信息
-  Widget _buildUserProfile() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final avatar = const CircleAvatar(
-            radius: 20.0,
-            backgroundColor: FacebookColors.primary,
-            child: Icon(
-              Icons.person,
-              color: FacebookColors.textOnPrimary,
-              size: 20.0,
-            ),
-          );
+  Widget _buildUserProfile(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        // Sprint1：先跳转到设置页中的外观/通用，后续Sprint2替换为“编辑资料”页面
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const SettingsPage()),
+        );
+      },
+      borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final avatar = const CircleAvatar(
+              radius: 20.0,
+              backgroundColor: FacebookColors.primary,
+              child: Icon(
+                Icons.person,
+                color: FacebookColors.textOnPrimary,
+                size: 20.0,
+              ),
+            );
 
           final texts = Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,6 +162,7 @@ class FacebookLeftSidebar extends StatelessWidget {
           );
         },
       ),
+    ),
     );
   }
 
