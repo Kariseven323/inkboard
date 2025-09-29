@@ -9,6 +9,8 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:drift/drift.dart' as _i500;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart' as _i558;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 
@@ -27,8 +29,9 @@ import '../../domain/usecases/search_diary_usecase.dart' as _i423;
 import '../../domain/usecases/tag_management_usecase.dart' as _i575;
 import '../../domain/usecases/update_delete_diary_entry_usecase.dart' as _i378;
 import '../services/app_config_service.dart' as _i639;
-import '../services/database_key_service.dart' as _i901;
-import '../services/impl/database_key_service_secure.dart' as _i902;
+import '../services/database_key_service.dart' as _i307;
+import '../services/impl/database_key_service_secure.dart' as _i587;
+import 'di_modules.dart' as _i176;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -37,48 +40,31 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
+    final diModules = _$DiModules();
     gh.factory<_i639.AppConfigService>(() => _i639.AppConfigService());
-    gh.lazySingleton<_i901.DatabaseKeyService>(
-      () => _i902.SecureDatabaseKeyService(),
-    );
-    gh.lazySingleton<_i160.AppDatabase>(
-      () => _i160.AppDatabase(keyService: gh<_i901.DatabaseKeyService>()),
-    );
-    // SearchResult 为值对象，不注册工厂以避免泛型边界问题
+    gh.lazySingleton<_i558.FlutterSecureStorage>(() => diModules.secureStorage);
     gh.lazySingleton<_i13.EncryptionService>(
       () => _i608.EncryptionServiceImpl(),
     );
-    gh.factory<_i828.CreateDiaryEntryParams>(
-      () => _i828.CreateDiaryEntryParams(
-        title: gh<String>(),
-        content: gh<String>(),
-        isFavorite: gh<bool>(),
-        moodScore: gh<int>(),
-        weather: gh<String>(),
-        location: gh<String>(),
-        tagNames: gh<List<String>>(),
-        defaultTagColor: gh<String>(),
+    gh.lazySingleton<_i160.AppDatabase>(
+      () => _i160.AppDatabase(
+        executor: gh<_i500.QueryExecutor>(),
+        keyService: gh<_i307.DatabaseKeyService>(),
       ),
     );
-    gh.factory<_i817.DiaryStatistics>(
-      () => _i817.DiaryStatistics(
-        totalCount: gh<int>(),
-        favoriteCount: gh<int>(),
-        monthlyCount: gh<int>(),
+    gh.lazySingleton<_i307.DatabaseKeyService>(
+      () => _i587.SecureDatabaseKeyService(
+        storage: gh<_i558.FlutterSecureStorage>(),
       ),
+    );
+    gh.lazySingleton<_i500.QueryExecutor>(
+      () => diModules.appQueryExecutor(gh<_i307.DatabaseKeyService>()),
     );
     gh.lazySingleton<_i627.TagRepository>(
       () => _i165.TagRepositoryImpl(gh<_i160.AppDatabase>()),
     );
     gh.lazySingleton<_i725.DiaryEntryRepository>(
       () => _i21.DiaryEntryRepositoryImpl(gh<_i160.AppDatabase>()),
-    );
-    gh.factory<_i575.CreateTagParams>(
-      () => _i575.CreateTagParams(
-        name: gh<String>(),
-        color: gh<String>(),
-        description: gh<String>(),
-      ),
     );
     gh.factory<_i817.GetDiaryEntriesUseCase>(
       () => _i817.GetDiaryEntriesUseCase(gh<_i725.DiaryEntryRepository>()),
@@ -90,26 +76,6 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i195.SearchServiceImpl(
         gh<_i725.DiaryEntryRepository>(),
         gh<_i627.TagRepository>(),
-      ),
-    );
-    gh.factory<_i575.TagStatistics>(
-      () => _i575.TagStatistics(
-        totalCount: gh<int>(),
-        usedCount: gh<int>(),
-        monthlyCreatedCount: gh<int>(),
-      ),
-    );
-    gh.factory<_i378.UpdateDiaryEntryParams>(
-      () => _i378.UpdateDiaryEntryParams(
-        id: gh<int>(),
-        title: gh<String>(),
-        content: gh<String>(),
-        isFavorite: gh<bool>(),
-        moodScore: gh<int>(),
-        weather: gh<String>(),
-        location: gh<String>(),
-        tagNames: gh<List<String>>(),
-        defaultTagColor: gh<String>(),
       ),
     );
     gh.factory<_i828.CreateDiaryEntryUseCase>(
@@ -130,28 +96,11 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i627.TagRepository>(),
       ),
     );
-    gh.factory<_i423.AdvancedSearchParams>(
-      () => _i423.AdvancedSearchParams(
-        titleQuery: gh<String>(),
-        contentQuery: gh<String>(),
-        tagIds: gh<List<int>>(),
-        startDate: gh<DateTime>(),
-        endDate: gh<DateTime>(),
-        isFavorite: gh<bool>(),
-        moodScore: gh<int>(),
-      ),
-    );
-    gh.factory<_i575.UpdateTagParams>(
-      () => _i575.UpdateTagParams(
-        id: gh<int>(),
-        name: gh<String>(),
-        color: gh<String>(),
-        description: gh<String>(),
-      ),
-    );
     gh.factory<_i423.SearchDiaryUseCase>(
       () => _i423.SearchDiaryUseCase(gh<_i396.SearchService>()),
     );
     return this;
   }
 }
+
+class _$DiModules extends _i176.DiModules {}
