@@ -1,0 +1,7 @@
+# 覆盖率忽略列表（正则），每行一个
+# 典型可忽略项：生成代码、入口文件、数据库表定义/底层数据库适配
+\.g\.dart$
+service_locator\.config\.dart$
+^lib/main\.dart$
+^lib/data/tables/.*
+^lib/data/database/.*

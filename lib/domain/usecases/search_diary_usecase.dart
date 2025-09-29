@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
 
 import '../common/result.dart';
@@ -97,7 +98,7 @@ class SearchDiaryUseCase {
 }
 
 /// 高级搜索参数
-class AdvancedSearchParams {
+class AdvancedSearchParams extends Equatable {
   final String? titleQuery;
   final String? contentQuery;
   final List<int>? tagIds;
@@ -106,7 +107,7 @@ class AdvancedSearchParams {
   final bool? isFavorite;
   final int? moodScore;
 
-  AdvancedSearchParams({
+  const AdvancedSearchParams({
     this.titleQuery,
     this.contentQuery,
     this.tagIds,
@@ -125,5 +126,21 @@ class AdvancedSearchParams {
         endDate != null ||
         isFavorite != null ||
         moodScore != null;
+  }
+
+  @override
+  List<Object?> get props {
+    final normalizedTags = tagIds == null
+        ? null
+        : (List<int>.from(tagIds!)..sort());
+    return [
+      titleQuery?.trim(),
+      contentQuery?.trim(),
+      normalizedTags,
+      startDate?.millisecondsSinceEpoch,
+      endDate?.millisecondsSinceEpoch,
+      isFavorite,
+      moodScore,
+    ];
   }
 }

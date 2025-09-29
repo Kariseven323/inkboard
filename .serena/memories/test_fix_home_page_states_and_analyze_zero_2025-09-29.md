@@ -1,0 +1,4 @@
+- dart analyze issues: reduced from 29 to 0 (removed unused imports/variables, fixed lint use_super_parameters, no_leading_underscores, unnecessary_import; replaced Color.value assertions with toARGB32 in tests; added context.mounted guard in HomePage confirmDismiss path).
+- Fixed test/home_page_states_test.dart: switched provider override to overrideWithValue(AsyncValue.error...) to deterministically hit error UI; avoid flakiness from StreamController/addError timing.
+- Keep in mind: Do not run theme_provider_persist_test until clarified; user requested fixing it eventually. Pattern for persistence tests: SharedPreferences.setMockInitialValues + ProviderContainer + small delay; verify state transitions.
+- Next planned steps: run flutter test (excluding any specified problematic test), fix remaining failures, then run coverage and raise to >=90%.

@@ -16,6 +16,15 @@ class InMemoryDiaryEntryRepository implements DiaryEntryRepository {
 
   @override
   Future<int> createDiaryEntry(DiaryEntry entry) async {
+    // 若外部已指定 id（如编辑流程预置条目），则尊重该 id，不强行改写
+    if (entry.id != null) {
+      _entries.add(entry);
+      // 保持自增游标不冲突
+      if (entry.id! >= _id) {
+        _id = entry.id! + 1;
+      }
+      return entry.id!;
+    }
     final e = entry.copyWith(id: _id++);
     _entries.add(e);
     return e.id!;
@@ -47,6 +56,12 @@ class InMemoryDiaryEntryRepository implements DiaryEntryRepository {
 
   @override
   Stream<List<DiaryEntry>> getDiaryEntriesByTags(List<int> tagIds) async* {
+    // 调试：打印当前条目与传入tagIds
+    assert(() {
+      // ignore: avoid_print
+      print('[InMemory] getDiaryEntriesByTags ids=$tagIds entries=${_entries.length}');
+      return true;
+    }());
     yield _entries.where((e) => e.tags.any((t) => t.id != null && tagIds.contains(t.id))).toList();
   }
 
@@ -110,7 +125,14 @@ class InMemoryDiaryEntryRepository implements DiaryEntryRepository {
 
 class InMemoryTagRepository implements TagRepository {
   final List<Tag> _tags = [];
+  final StreamController<List<Tag>> _tagsController = StreamController<List<Tag>>.broadcast();
   int _id = 1;
+
+  void _emit() {
+    if (!_tagsController.isClosed) {
+      _tagsController.add(List.unmodifiable(_tags));
+    }
+  }
 
   @override
   Future<int> createTag(Tag tag) async {
@@ -123,6 +145,7 @@ class InMemoryTagRepository implements TagRepository {
       description: tag.description,
     );
     _tags.add(t);
+    _emit();
     return t.id!;
   }
 
@@ -130,6 +153,7 @@ class InMemoryTagRepository implements TagRepository {
   Future<bool> deleteTag(int id) async {
     final before = _tags.length;
     _tags.removeWhere((t) => t.id == id);
+    _emit();
     return _tags.length < before;
   }
 
@@ -152,6 +176,7 @@ class InMemoryTagRepository implements TagRepository {
       usageCount: t.usageCount + 1,
       description: t.description,
     );
+    _emit();
     return true;
   }
 
@@ -168,38 +193,46 @@ class InMemoryTagRepository implements TagRepository {
       usageCount: t.usageCount > 0 ? t.usageCount - 1 : 0,
       description: t.description,
     );
+    _emit();
     return true;
   }
 
-  // 以下流式接口为测试方便返回静态一次
+  // 以下流式接口：返回当前快照 + 后续变更
   @override
   Stream<List<Tag>> getAllTags() async* {
     yield List.unmodifiable(_tags);
+    yield* _tagsController.stream;
   }
   @override
-  Stream<List<Tag>> getPopularTags({int limit = 10}) async* {
-    final list = _tags.toList()..sort((a,b)=>b.usageCount.compareTo(a.usageCount));
-    yield list.take(limit).toList();
+  Stream<List<Tag>> getPopularTags({int limit = 10}) {
+    return getAllTags().map((list) {
+      final copy = list.toList()..sort((a,b)=>b.usageCount.compareTo(a.usageCount));
+      return copy.take(limit).toList();
+    });
   }
   @override
-  Stream<List<Tag>> getRecentTags({int limit = 5}) async* {
-    yield _tags.reversed.take(limit).toList();
+  Stream<List<Tag>> getRecentTags({int limit = 5}) {
+    return getAllTags().map((list) => list.reversed.take(limit).toList());
   }
   @override
-  Stream<List<Tag>> searchTags(String query) async* {
-    yield _tags.where((t)=>t.name.contains(query)).toList();
+  Stream<List<Tag>> searchTags(String query) {
+    return getAllTags().map((list) => list.where((t)=>t.name.contains(query)).toList());
   }
 
   @override
   Future<bool> updateTag(Tag tag) async {
     final idx = _tags.indexWhere((t)=>t.id==tag.id);
-    if (idx==-1) return false; _tags[idx]=tag; return true;
+    if (idx==-1) return false; 
+    _tags[idx]=tag; 
+    _emit();
+    return true;
   }
 
   @override
   Future<bool> deleteTags(List<int> ids) async {
     final before = _tags.length;
     _tags.removeWhere((t)=>ids.contains(t.id));
+    _emit();
     return _tags.length < before;
   }
 

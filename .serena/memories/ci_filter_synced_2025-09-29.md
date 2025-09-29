@@ -1,0 +1,1 @@
+已实施方案A：scripts/filter_lcov.py 现会在内置规则基础上，读取并合并根目录 coverage_exclude.lst（忽略注释与空行，非法正则被忽略）。CI 已调用该脚本，无需改工作流，即可与本地过滤保持一致。

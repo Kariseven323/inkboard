@@ -416,6 +416,7 @@ class HomePage extends ConsumerWidget {
         HapticFeedback.selectionClick();
         final ok = await _showDeleteConfirmDialog(context, entry);
         if (ok) {
+          if (!context.mounted) return ok;
           HapticFeedback.heavyImpact();
           await _deleteDiary(context, entry);
         }

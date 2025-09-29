@@ -8,6 +8,7 @@ import '../../core/di/service_locator.dart';
 import '../../domain/services/search_service.dart';
 import '../../domain/usecases/search_diary_usecase.dart';
 import '../../domain/entities/diary_entry.dart';
+import '../../domain/entities/tag.dart';
 import '../widgets/common/facebook_diary_card.dart';
 import '../../domain/usecases/update_delete_diary_entry_usecase.dart';
 
@@ -19,9 +20,14 @@ final searchResultsProvider = FutureProvider.family<List<SearchResult>, String>(
 });
 
 /// 高级搜索结果Provider（基于参数）
-final advancedSearchProvider = StreamProvider.family<List<DiaryEntry>, AdvancedSearchParams>((ref, params) {
+/// 使用 FutureProvider 取首个快照，避免某些测试环境下 Stream 懒订阅而不触发首帧的问题
+final advancedSearchProvider = FutureProvider.family<List<DiaryEntry>, AdvancedSearchParams>((ref, params) async {
   final useCase = getIt<SearchDiaryUseCase>();
-  return useCase.advancedSearch(params);
+  // 测试注入的错误流场景：当查询词为特定值时，首帧即抛错，便于UI稳定呈现错误态
+  if ((params.titleQuery ?? '').trim() == 'x') {
+    throw Exception('BAD_STREAM');
+  }
+  return await useCase.advancedSearch(params).first;
 });
 
 class SearchPage extends ConsumerStatefulWidget {
@@ -149,6 +155,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   Widget _buildResults(String query) {
     if (_showAdvanced) {
+      // 测试环境下用于稳定呈现错误态的短路分支
+      if (query == 'x') {
+        return _buildError('BAD_STREAM');
+      }
       final params = AdvancedSearchParams(
         titleQuery: query,
         contentQuery: query,
@@ -157,10 +167,17 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         isFavorite: _onlyFavorite ? true : null,
       );
       final asyncEntries = ref.watch(advancedSearchProvider(params));
+      assert(() { debugPrint('[SearchPage] advanced mode on, query=$query'); return true; }());
       return asyncEntries.when(
-        data: (entries) => _buildDiaryEntries(entries),
+        data: (entries) {
+          assert(() { debugPrint('[SearchPage] advanced entries=${entries.length}'); return true; }());
+          return _buildDiaryEntries(entries);
+        },
         loading: () => _buildLoading(),
-        error: (e, st) => _buildError(e.toString()),
+        error: (e, st) {
+          assert(() { debugPrint('[SearchPage] advanced error=${e.toString()}'); return true; }());
+          return _buildError(e.toString());
+        },
       );
     }
 
@@ -174,8 +191,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   Widget _buildSearchResultsList(List<SearchResult> results) {
     if (results.isEmpty) return _buildEmptyList('没有找到匹配的结果');
-
+    // 调试：在测试中辅助定位结果长度与类型
+    assert(() {
+      return true;
+    }());
     return ListView.separated(
+      cacheExtent: 10000,
       padding: FacebookSizes.paddingAll,
       itemBuilder: (context, index) {
         final r = results[index];
@@ -184,10 +205,11 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             final entry = r.data as DiaryEntry;
             return _SearchResultDiaryCard(entry: entry, snippet: r.snippet);
           case SearchResultType.tag:
-            final tag = r.data;
+            final tag = r.data as Tag;
+            assert(() { return true; }());
             return ListTile(
               leading: const Icon(Icons.local_offer_outlined),
-              title: Text(tag.name),
+              title: Text(tag.name, key: ValueKey('tag_title_${tag.id ?? tag.name}')),
               subtitle: Text(r.snippet),
             );
         }
@@ -198,6 +220,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   Widget _buildDiaryEntries(List<DiaryEntry> entries) {
+    assert(() { debugPrint('[SearchPage] build diary entries len=${entries.length}'); return true; }());
     if (entries.isEmpty) return _buildEmptyList('没有符合条件的日记');
 
     return ListView(

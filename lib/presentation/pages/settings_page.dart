@@ -113,7 +113,7 @@ class SettingsPage extends ConsumerWidget {
       padding: EdgeInsets.only(bottom: FacebookSizes.spacing8),
       child: Text(
         title,
-        style: FacebookTextStyles.subtitle1.copyWith(
+        style: FacebookTextStyles.headline6.copyWith(
           color: FacebookColors.textPrimary,
           fontWeight: FontWeight.w600,
         ),
@@ -132,4 +132,3 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 }
-

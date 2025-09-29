@@ -1,0 +1,3 @@
+现状：CI 使用 scripts/filter_lcov.py 过滤覆盖率（见 .github/workflows/flutter_ci.yml:35-38），未调用 scripts/coverage.sh。coverage.sh 从 coverage_exclude.lst 加载排除规则（scripts/coverage.sh:19-35），而 filter_lcov.py 仅内置少量生成文件/平台文件正则（scripts/filter_lcov.py:5-12），未读取 coverage_exclude.lst。
+影响：本地 filtered 覆盖率可能高于 CI；CI 可能因未排除 lib/main.dart、lib/data/tables/**、lib/data/database/**、service_locator.config.dart 而降低覆盖率并触发 90% 门槛失败。
+建议：优先修改 filter_lcov.py 以读取 coverage_exclude.lst 与本地一致；或在工作流中直接改为运行 scripts/coverage.sh（需避免重复跑 tests/阈值）。

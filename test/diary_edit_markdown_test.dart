@@ -33,9 +33,15 @@ void main() {
     await tester.enterText(contentField, '# Title\n**bold** text');
     await tester.pump(const Duration(milliseconds: 100));
 
-    // 预览中应看到渲染后的文本（以纯文本匹配）
-    expect(find.textContaining('Title'), findsOneWidget);
-    expect(find.textContaining('bold'), findsWidgets);
+    // 预览区包含文本（限定在预览容器内，避免编辑器中的重复匹配）
+    expect(
+      find.descendant(of: find.byKey(const ValueKey('preview')), matching: find.textContaining('Title')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: find.byKey(const ValueKey('preview')), matching: find.textContaining('bold')),
+      findsWidgets,
+    );
   });
 
   testWidgets('窄屏：SegmentedButton 在编辑/预览之间切换', (tester) async {

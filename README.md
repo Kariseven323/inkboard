@@ -131,8 +131,10 @@ flutter run
 # 运行测试
 flutter test
 
-# 生成代码覆盖率
-flutter test --coverage
+# 生成覆盖率（含过滤与阈值校验，默认阈值90%）
+bash scripts/coverage.sh
+# 自定义阈值（例如 92%）
+MIN_COVERAGE=92 bash scripts/coverage.sh
 
 # 代码静态分析
 flutter analyze
@@ -158,9 +160,9 @@ dart run flutter_native_splash:create
 ## 质量保证
 
 ### 测试覆盖目标
-- **单元测试覆盖率**: > 80%
-- **关键业务逻辑**: 100%
-- **UI组件覆盖率**: > 70%
+- **整体测试覆盖率（过滤后）**: ≥ 90%
+- **关键业务逻辑**: 尽量接近 100%
+- **UI组件覆盖率**: ≥ 70%
 
 ### 性能指标
 - **应用启动时间**: < 3秒
