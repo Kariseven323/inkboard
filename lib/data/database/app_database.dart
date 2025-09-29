@@ -94,9 +94,9 @@ class AppDatabase extends _$AppDatabase {
 
         // 回收站自动清理：清除超过30天的软删除条目
         final threshold = DateTime.now().subtract(const Duration(days: 30));
-        await (delete(diaryEntries)
-              ..where((e) => e.deletedAt.isSmallerThanValue(threshold)))
-            .go();
+        await (delete(
+          diaryEntries,
+        )..where((e) => e.deletedAt.isSmallerThanValue(threshold))).go();
       },
     );
   }

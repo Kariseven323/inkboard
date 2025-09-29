@@ -60,7 +60,9 @@ void main() {
         PRIMARY KEY (id)
       );
     ''');
-    sqliteDb.execute("INSERT INTO user_profiles(id, updated_at) VALUES (1, strftime('%s','now')); ");
+    sqliteDb.execute(
+      "INSERT INTO user_profiles(id, updated_at) VALUES (1, strftime('%s','now')); ",
+    );
 
     // 设置为 v4（触发 AppDatabase.onUpgrade from=4 -> to=6）
     sqliteDb.execute('PRAGMA user_version = 4;');
@@ -70,22 +72,24 @@ void main() {
     final app = AppDatabase(executor: raw);
 
     // 3) 断言：diary_entries 新增列存在
-    final diaryInfo = await app.customSelect(
-      "PRAGMA table_info('diary_entries');",
-    ).get();
+    final diaryInfo = await app
+        .customSelect("PRAGMA table_info('diary_entries');")
+        .get();
     final cols = diaryInfo.map((r) => r.data['name'] as String).toSet();
     expect(cols.contains('is_draft'), isTrue, reason: 'v5 应新增 is_draft');
     expect(cols.contains('deleted_at'), isTrue, reason: 'v6 应新增 deleted_at');
 
     // 4) 断言：user_profiles 表存在且默认记录仍在
-    final hasUserProfiles = await app.customSelect(
-      "SELECT name FROM sqlite_master WHERE type='table' AND name='user_profiles';",
-    ).get();
+    final hasUserProfiles = await app
+        .customSelect(
+          "SELECT name FROM sqlite_master WHERE type='table' AND name='user_profiles';",
+        )
+        .get();
     expect(hasUserProfiles.isNotEmpty, isTrue, reason: '应存在 user_profiles 表');
 
-    final defaultProfile = await app.customSelect(
-      'SELECT id FROM user_profiles WHERE id = 1;',
-    ).get();
+    final defaultProfile = await app
+        .customSelect('SELECT id FROM user_profiles WHERE id = 1;')
+        .get();
     expect(defaultProfile.isNotEmpty, isTrue, reason: '应插入默认用户资料记录');
 
     await app.close();

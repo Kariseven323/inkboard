@@ -6,4 +6,3 @@ abstract class UserProfileRepository {
   Future<bool> upsertProfile(UserProfile profile);
   Future<bool> clearAvatar();
 }
-

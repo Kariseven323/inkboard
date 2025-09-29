@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:drift/drift.dart';
 import 'package:injectable/injectable.dart';
 
@@ -14,9 +12,9 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
 
   @override
   Future<UserProfile?> getProfile() async {
-    final row = await (_db.select(_db.userProfiles)
-          ..where((tbl) => tbl.id.equals(1)))
-        .getSingleOrNull();
+    final row = await (_db.select(
+      _db.userProfiles,
+    )..where((tbl) => tbl.id.equals(1))).getSingleOrNull();
     if (row == null) return null;
     return _map(row);
   }
@@ -31,7 +29,9 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
   Future<bool> upsertProfile(UserProfile profile) async {
     final data = UserProfilesCompanion(
       id: const Value(1),
-      avatar: profile.avatar != null ? Value(profile.avatar!) : const Value.absent(),
+      avatar: profile.avatar != null
+          ? Value(profile.avatar!)
+          : const Value.absent(),
       nickname: Value(profile.nickname),
       signature: Value(profile.signature),
       gender: Value(profile.gender),
@@ -47,18 +47,18 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
       final inserted = await _db.into(_db.userProfiles).insert(data);
       return inserted > 0;
     } else {
-      final count = await (_db.update(_db.userProfiles)
-            ..where((tbl) => tbl.id.equals(1)))
-          .write(data);
+      final count = await (_db.update(
+        _db.userProfiles,
+      )..where((tbl) => tbl.id.equals(1))).write(data);
       return count > 0;
     }
   }
 
   @override
   Future<bool> clearAvatar() async {
-    final count = await (_db.update(_db.userProfiles)
-          ..where((tbl) => tbl.id.equals(1)))
-        .write(const UserProfilesCompanion(avatar: Value(null)));
+    final count =
+        await (_db.update(_db.userProfiles)..where((tbl) => tbl.id.equals(1)))
+            .write(const UserProfilesCompanion(avatar: Value(null)));
     return count > 0;
   }
 
@@ -76,4 +76,3 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
     );
   }
 }
-

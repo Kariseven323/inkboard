@@ -37,56 +37,9 @@ jobs:
           python3 scripts/filter_lcov.py
           echo "Filtered coverage at coverage/lcov.filtered.info"
 
-      - name: Check coverage threshold (filtered)
-        env:
-          THRESHOLD: ${{ env.COVERAGE_THRESHOLD }}
+      - name: Enforce coverage threshold (90%)
         run: |
-          python3 - << 'PY'
-          import os, sys
-
-          def compute_pct(path: str) -> float:
-            lf = 0
-            lh = 0
-            with open(path, 'r', encoding='utf-8') as f:
-              for line in f:
-                if line.startswith('LF:'):
-                  lf += int(line.strip().split(':')[1])
-                elif line.startswith('LH:'):
-                  lh += int(line.strip().split(':')[1])
-            if lf == 0:
-              return 0.0
-            return (lh / lf) * 100.0
-
-          # 从环境变量读取阈值
-          try:
-            threshold = float(os.environ.get('THRESHOLD', '90.0'))
-          except ValueError:
-            print(f"Invalid THRESHOLD env: {os.environ.get('THRESHOLD')}\nFailing.")
-            sys.exit(1)
-
-          raw_path = 'coverage/lcov.info'
-          filtered_path = 'coverage/lcov.filtered.info'
-
-          # 计算并展示未过滤与过滤后的覆盖率
-          try:
-            raw_pct = compute_pct(raw_path)
-          except FileNotFoundError:
-            print(f'{raw_path} not found. Failing.')
-            sys.exit(1)
-
-          try:
-            filtered_pct = compute_pct(filtered_path)
-          except FileNotFoundError:
-            print(f'{filtered_path} not found. Failing.')
-            sys.exit(1)
-
-          print(f'Unfiltered coverage: {raw_pct:.2f}%')
-          print(f'Filtered coverage:   {filtered_pct:.2f}% (threshold {threshold:.2f}%)')
-
-          if filtered_pct + 1e-9 < threshold:
-            print('Coverage below threshold. Failing.')
-            sys.exit(1)
-          PY
+          COVERAGE_THRESHOLD=${{ env.COVERAGE_THRESHOLD }} bash scripts/coverage.sh --filter-only
 
       - name: Upload coverage artifact (filtered)
         uses: actions/upload-artifact@v4

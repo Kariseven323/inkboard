@@ -48,7 +48,9 @@ class _RecycleBinPageState extends State<RecycleBinPage> {
               return ListTile(
                 tileColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
+                  borderRadius: BorderRadius.circular(
+                    FacebookSizes.radiusLarge,
+                  ),
                   side: const BorderSide(color: FacebookColors.border),
                 ),
                 title: Text(e.title, style: FacebookTextStyles.bodyLarge),
@@ -64,8 +66,9 @@ class _RecycleBinPageState extends State<RecycleBinPage> {
                       onPressed: () async {
                         HapticFeedback.selectionClick();
                         await repo.restoreDiaryEntry(e.id!);
-                        if (!mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        if (!context.mounted) return;
+                        final messenger = ScaffoldMessenger.of(context);
+                        messenger.showSnackBar(
                           const SnackBar(content: Text('已恢复')),
                         );
                       },
@@ -85,26 +88,34 @@ class _RecycleBinPageState extends State<RecycleBinPage> {
                               ),
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx, true),
-                                child: Text('删除', style: TextStyle(color: FacebookColors.error)),
+                                child: Text(
+                                  '删除',
+                                  style: TextStyle(color: FacebookColors.error),
+                                ),
                               ),
                             ],
                           ),
                         );
                         if (ok == true) {
                           await repo.purgeDiaryEntry(e.id!);
-                          if (!mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
+                          if (!context.mounted) return;
+                          final messenger2 = ScaffoldMessenger.of(context);
+                          messenger2.showSnackBar(
                             const SnackBar(content: Text('已彻底删除')),
                           );
                         }
                       },
-                      child: Text('彻底删除', style: TextStyle(color: FacebookColors.error)),
+                      child: Text(
+                        '彻底删除',
+                        style: TextStyle(color: FacebookColors.error),
+                      ),
                     ),
                   ],
                 ),
               );
             },
-            separatorBuilder: (_, __) => SizedBox(height: FacebookSizes.spacing12),
+            separatorBuilder: (_, __) =>
+                SizedBox(height: FacebookSizes.spacing12),
             itemCount: items.length,
           );
         },
@@ -112,4 +123,3 @@ class _RecycleBinPageState extends State<RecycleBinPage> {
     );
   }
 }
-

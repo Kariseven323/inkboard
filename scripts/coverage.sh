@@ -42,27 +42,8 @@ if [[ ! -f "$LCOV" ]]; then
   exit 1
 fi
 
-if [[ -f "$EXCLUDE_FILE" ]]; then
-  echo "[coverage] Applying filters from coverage_exclude.lst"
-  # Build alternation pattern from non-empty, non-comment lines
-  PATTERN=$(grep -vE '^(#|\s*$)' "$EXCLUDE_FILE" | sed ':a;N;$!ba;s/\n/|/g')
-  if [[ -n "$PATTERN" ]]; then
-    awk -v pat="$PATTERN" '
-      BEGIN{skip=0}
-      /^SF:/ {
-        path=substr($0,4);
-        skip= (path ~ pat) ? 1 : 0;
-      }
-      { if (!skip) print }
-      /^end_of_record/ { skip=0 }
-    ' "$LCOV" > "$FILTERED"
-  else
-    cp "$LCOV" "$FILTERED"
-  fi
-else
-  echo "[coverage] No exclude list found; copying raw lcov"
-  cp "$LCOV" "$FILTERED"
-fi
+echo "[coverage] Filtering LCOV via Python script (includes built-in platform/generated excludes)"
+python3 "$ROOT_DIR/scripts/filter_lcov.py"
 
 calc() {
   awk 'BEGIN{LF=0;LH=0} /^LF:/ {LF+=substr($0,4)} /^LH:/ {LH+=substr($0,4)} END{ if (LF==0) {print 0} else {printf "%.2f", (LH/LF)*100 } }' "$1"

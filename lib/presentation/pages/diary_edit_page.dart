@@ -32,7 +32,6 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
   bool _isFavorite = false;
   int? _moodScore;
   bool _previewOnlyOnNarrow = false;
-  bool _isDraft = false;
   int? _draftId;
   DateTime _lastEditAt = DateTime.now();
   DateTime _lastAutoSavedAt = DateTime.fromMillisecondsSinceEpoch(0);
@@ -55,7 +54,6 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
       _contentController.text = entry.content;
       _isFavorite = entry.isFavorite;
       _moodScore = entry.moodScore;
-      _isDraft = entry.isDraft;
 
       // 将标签转换为字符串
       final tagNames = entry.tags.map((tag) => tag.name).join(' ');
@@ -116,7 +114,11 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
       ),
       actions: [
         TextButton(
-          onPressed: _isLoading ? null : () async { await _autoSaveDraft(silent: false); },
+          onPressed: _isLoading
+              ? null
+              : () async {
+                  await _autoSaveDraft(silent: false);
+                },
           child: Text(
             '暂存',
             style: FacebookTextStyles.bodyMedium.copyWith(
@@ -410,43 +412,51 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
       if (_isEditMode || _draftId != null) {
         final id = _isEditMode ? widget.diaryEntry!.id! : _draftId!;
         final usecase = getIt<UpdateDiaryEntryUseCase>();
-        final r = await usecase.execute(UpdateDiaryEntryParams(
-          id: id,
-          title: _titleController.text,
-          content: _contentController.text,
-          isFavorite: _isFavorite,
-          moodScore: _moodScore,
-          tagNames: tagNames,
-          defaultTagColor: '#1877F2',
-          isDraft: true,
-        ));
+        final r = await usecase.execute(
+          UpdateDiaryEntryParams(
+            id: id,
+            title: _titleController.text,
+            content: _contentController.text,
+            isFavorite: _isFavorite,
+            moodScore: _moodScore,
+            tagNames: tagNames,
+            defaultTagColor: '#1877F2',
+            isDraft: true,
+          ),
+        );
         if (r.isSuccess) {
-          _isDraft = true;
           _lastAutoSavedAt = DateTime.now();
           if (!silent && mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('已暂存'), backgroundColor: FacebookColors.info),
+              const SnackBar(
+                content: Text('已暂存'),
+                backgroundColor: FacebookColors.info,
+              ),
             );
           }
         }
       } else {
         final usecase = getIt<CreateDiaryEntryUseCase>();
-        final r = await usecase.execute(CreateDiaryEntryParams(
-          title: _titleController.text,
-          content: _contentController.text,
-          isFavorite: _isFavorite,
-          moodScore: _moodScore,
-          tagNames: tagNames,
-          defaultTagColor: '#1877F2',
-          isDraft: true,
-        ));
+        final r = await usecase.execute(
+          CreateDiaryEntryParams(
+            title: _titleController.text,
+            content: _contentController.text,
+            isFavorite: _isFavorite,
+            moodScore: _moodScore,
+            tagNames: tagNames,
+            defaultTagColor: '#1877F2',
+            isDraft: true,
+          ),
+        );
         if (r.isSuccess) {
           _draftId = r.data;
-          _isDraft = true;
           _lastAutoSavedAt = DateTime.now();
           if (!silent && mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('已创建草稿'), backgroundColor: FacebookColors.info),
+              const SnackBar(
+                content: Text('已创建草稿'),
+                backgroundColor: FacebookColors.info,
+              ),
             );
           }
         }
@@ -503,10 +513,18 @@ class _DiaryEditPageState extends ConsumerState<DiaryEditPage> {
         final p = await repo.getProfile();
         String? v;
         switch (k) {
-          case 'nickname': v = p?.nickname; break;
-          case 'signature': v = p?.signature; break;
-          case 'email': v = p?.email; break;
-          case 'region': v = p?.region; break;
+          case 'nickname':
+            v = p?.nickname;
+            break;
+          case 'signature':
+            v = p?.signature;
+            break;
+          case 'email':
+            v = p?.email;
+            break;
+          case 'region':
+            v = p?.region;
+            break;
         }
         if ((v ?? '').isEmpty) return;
         _insertAtCursor(_contentController, v!);

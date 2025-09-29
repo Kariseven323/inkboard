@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,6 +24,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   DateTime? _birthday;
   final _region = TextEditingController();
   final _email = TextEditingController();
+  // 使用 MemoryImage 的 bytes 类型，Uint8List 可由 flutter/services 暴露
   Uint8List? _avatar;
   bool _loading = false;
 
@@ -73,7 +72,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             onPressed: _loading ? null : _save,
             child: Text(
               '保存',
-              style: FacebookTextStyles.bodyMedium.copyWith(color: Colors.white),
+              style: FacebookTextStyles.bodyMedium.copyWith(
+                color: Colors.white,
+              ),
             ),
           ),
         ],
@@ -85,7 +86,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           children: [
             _avatarSection(),
             SizedBox(height: FacebookSizes.spacing16),
-            _textField('昵称', _nickname, maxLen: 30, fieldKey: const ValueKey('profile_nickname_field')),
+            _textField(
+              '昵称',
+              _nickname,
+              maxLen: 30,
+              fieldKey: const ValueKey('profile_nickname_field'),
+            ),
             SizedBox(height: FacebookSizes.spacing12),
             _textField('个性签名', _signature, maxLen: 80),
             SizedBox(height: FacebookSizes.spacing12),
@@ -110,7 +116,11 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           backgroundColor: FacebookColors.primary.withValues(alpha: 0.1),
           backgroundImage: _avatar != null ? MemoryImage(_avatar!) : null,
           child: _avatar == null
-              ? const Icon(Icons.person, color: FacebookColors.primary, size: 36)
+              ? const Icon(
+                  Icons.person,
+                  color: FacebookColors.primary,
+                  size: 36,
+                )
               : null,
         ),
         SizedBox(width: FacebookSizes.spacing12),
@@ -152,7 +162,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     } catch (_) {}
   }
 
-  Widget _textField(String label, TextEditingController c, {int? maxLen, Key? fieldKey}) {
+  Widget _textField(
+    String label,
+    TextEditingController c, {
+    int? maxLen,
+    Key? fieldKey,
+  }) {
     return TextFormField(
       key: fieldKey,
       controller: c,
@@ -166,7 +181,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       valueListenable: _gender,
       builder: (context, value, _) {
         return DropdownButtonFormField<String>(
-          value: value,
+          initialValue: value,
           items: const [
             DropdownMenuItem(value: 'male', child: Text('男')),
             DropdownMenuItem(value: 'female', child: Text('女')),
@@ -182,7 +197,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   Widget _birthdayField(BuildContext context) {
     final text = _birthday == null
         ? '选择日期'
-        : '${_birthday!.year}-${_birthday!.month.toString().padLeft(2, '0')}-${_birthday!.day.toString().padLeft(2, '0') }';
+        : '${_birthday!.year}-${_birthday!.month.toString().padLeft(2, '0')}-${_birthday!.day.toString().padLeft(2, '0')}';
     return ListTile(
       contentPadding: EdgeInsets.zero,
       title: const Text('生日'),
@@ -236,12 +251,18 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     setState(() => _loading = false);
     if (ok) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('保存成功'), backgroundColor: FacebookColors.success),
+        const SnackBar(
+          content: Text('保存成功'),
+          backgroundColor: FacebookColors.success,
+        ),
       );
       Navigator.of(context).pop(true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('保存失败'), backgroundColor: FacebookColors.error),
+        const SnackBar(
+          content: Text('保存失败'),
+          backgroundColor: FacebookColors.error,
+        ),
       );
     }
   }

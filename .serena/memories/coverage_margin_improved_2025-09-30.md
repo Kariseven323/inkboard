@@ -1,0 +1,1 @@
+Added tests to improve coverage margin: facebook_layout_more_test.dart (tablet/desktop branches and sidebar flags), favorites_page_more_actions_test.dart (edit/share actions), result_more_test.dart (map(null) failure), tag_management_usecase_streams_more_test.dart (streams + TagStatistics getters). Filtered coverage now 90.44% via scripts/coverage.sh --filter-only.

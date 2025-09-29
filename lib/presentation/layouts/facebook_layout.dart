@@ -5,7 +5,6 @@ import '../../core/theme/facebook_sizes.dart';
 import '../widgets/common/facebook_left_sidebar.dart';
 import '../widgets/common/facebook_right_sidebar.dart';
 import '../pages/search_page.dart';
-import '../pages/settings_page.dart';
 
 /// Facebook风格的主布局
 /// 实现三栏布局：左侧导航栏 + 主内容区 + 右侧栏
@@ -58,10 +57,7 @@ class FacebookLayout extends StatelessWidget {
     );
   }
 
-  /// 构建图标按钮 - Facebook风格（36px圆形，悬停高亮）
-  Widget _fbIconButton(IconData icon, VoidCallback onPressed, {Key? key}) {
-    return _HoverIconButton(icon: icon, onPressed: onPressed, buttonKey: key);
-  }
+  // 已移除未使用的 _fbIconButton，避免未使用代码导致的告警
 
   /// 构建主体布局
   Widget _buildBody(
@@ -143,58 +139,7 @@ class FacebookLayout extends StatelessWidget {
   }
 }
 
-/// 内部私有组件：带悬停高亮效果的圆形图标按钮
-class _HoverIconButton extends StatefulWidget {
-  final IconData icon;
-  final VoidCallback onPressed;
-  final Key? buttonKey;
-
-  const _HoverIconButton({
-    required this.icon,
-    required this.onPressed,
-    this.buttonKey,
-  });
-
-  @override
-  State<_HoverIconButton> createState() => _HoverIconButtonState();
-}
-
-class _HoverIconButtonState extends State<_HoverIconButton> {
-  bool _hovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: AnimatedContainer(
-        key: widget.buttonKey,
-        duration: FacebookSizes.animationFast,
-        width: 36.w,
-        height: 36.w,
-        margin: EdgeInsets.symmetric(horizontal: 4.w),
-        decoration: BoxDecoration(
-          color: _hovered ? FacebookColors.inputBackground : Colors.transparent,
-          shape: BoxShape.circle,
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(18.r),
-            onTap: widget.onPressed,
-            child: Center(
-              child: Icon(
-                widget.icon,
-                color: FacebookColors.textOnPrimary,
-                size: 20.w,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+// 已移除未使用的 _HoverIconButton 组件，避免未使用参数触发告警
 
 /// 顶部导航搜索框（带悬停与聚焦态的Facebook风格）
 class _NavSearchField extends StatefulWidget {

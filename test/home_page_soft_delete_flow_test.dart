@@ -16,7 +16,7 @@ void main() {
   testWidgets('HomePage 删除 -> 软删除并提示移入回收站', (tester) async {
     await getIt.reset();
     final entryRepo = InMemoryDiaryEntryRepository();
-    final tagRepo = InMemoryTagRepository();
+    final _ = InMemoryTagRepository(); // 占位以兼容用例初始化
     final softDeleteUc = SoftDeleteDiaryEntryUseCase(entryRepo);
     getIt.registerSingleton<SoftDeleteDiaryEntryUseCase>(softDeleteUc);
 
@@ -47,9 +47,8 @@ void main() {
         overrides: [override],
         child: ScreenUtilInit(
           designSize: const Size(390, 844),
-          builder: (context, _) => const MaterialApp(
-            home: Scaffold(body: HomePage()),
-          ),
+          builder: (context, _) =>
+              const MaterialApp(home: Scaffold(body: HomePage())),
         ),
       ),
     );

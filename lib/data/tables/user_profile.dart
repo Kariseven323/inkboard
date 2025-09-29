@@ -33,4 +33,3 @@ class UserProfiles extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
-

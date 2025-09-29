@@ -20,13 +20,15 @@ abstract class DiModules {
     return LazyDatabase(() async {
       final dir = await getApplicationDocumentsDirectory();
       final file = File(p.join(dir.path, 'inkboard_database.sqlite'));
-      return NativeDatabase.createInBackground(file, setup: (db) async {
-        try {
-          final key = await keyService.getOrCreateKey();
-          db.execute('PRAGMA key = "$key";');
-        } catch (_) {}
-      });
+      return NativeDatabase.createInBackground(
+        file,
+        setup: (db) async {
+          try {
+            final key = await keyService.getOrCreateKey();
+            db.execute('PRAGMA key = "$key";');
+          } catch (_) {}
+        },
+      );
     });
   }
 }
-

@@ -124,9 +124,9 @@ class FacebookLeftSidebar extends StatelessWidget {
     }
     return InkWell(
       onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const ProfileEditPage()),
-        );
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const ProfileEditPage()));
       },
       borderRadius: BorderRadius.circular(FacebookSizes.radiusLarge),
       child: Container(
@@ -137,58 +137,62 @@ class FacebookLeftSidebar extends StatelessWidget {
                 future: repo.getProfile(),
                 builder: (context, snapshot) {
                   final p = snapshot.data;
-            final avatar = CircleAvatar(
-              radius: 20.0,
-              backgroundColor: FacebookColors.primary,
-              backgroundImage: p?.avatar != null ? MemoryImage(p!.avatar!) : null,
-              child: p?.avatar == null
-                  ? const Icon(
-                      Icons.person,
-                      color: FacebookColors.textOnPrimary,
-                      size: 20.0,
-                    )
-                  : null,
-            );
+                  final avatar = CircleAvatar(
+                    radius: 20.0,
+                    backgroundColor: FacebookColors.primary,
+                    backgroundImage: p?.avatar != null
+                        ? MemoryImage(p!.avatar!)
+                        : null,
+                    child: p?.avatar == null
+                        ? const Icon(
+                            Icons.person,
+                            color: FacebookColors.textOnPrimary,
+                            size: 20.0,
+                          )
+                        : null,
+                  );
 
-            final texts = Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  (p?.nickname?.isNotEmpty ?? false) ? p!.nickname! : '用户名',
-                  style: FacebookTextStyles.username,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  '编辑资料',
-                  style: FacebookTextStyles.caption.copyWith(
-                    color: FacebookColors.primary,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            );
-
-            return LayoutBuilder(
-              builder: (context, constraints) {
-                if (constraints.maxWidth < 160) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                  final texts = Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Center(child: avatar),
-                      const SizedBox(height: 8),
-                      texts,
+                      Text(
+                        (p?.nickname?.isNotEmpty ?? false)
+                            ? p!.nickname!
+                            : '用户名',
+                        style: FacebookTextStyles.username,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        '编辑资料',
+                        style: FacebookTextStyles.caption.copyWith(
+                          color: FacebookColors.primary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ],
                   );
-                }
-                return Row(
-                  children: [
-                    avatar,
-                    const SizedBox(width: 12),
-                    Expanded(child: texts),
-                  ],
-                );
-              },
-            );
+
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      if (constraints.maxWidth < 160) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Center(child: avatar),
+                            const SizedBox(height: 8),
+                            texts,
+                          ],
+                        );
+                      }
+                      return Row(
+                        children: [
+                          avatar,
+                          const SizedBox(width: 12),
+                          Expanded(child: texts),
+                        ],
+                      );
+                    },
+                  );
                 },
               ),
       ),

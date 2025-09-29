@@ -12,7 +12,9 @@ void main() {
   setUpAll(() async {
     // 使用 Fake 仓库，避免依赖真实数据库/插件导致用例阻塞
     await getIt.reset(dispose: true);
-    getIt.registerLazySingleton<UserProfileRepository>(() => _FakeUserProfileRepository());
+    getIt.registerLazySingleton<UserProfileRepository>(
+      () => _FakeUserProfileRepository(),
+    );
   });
 
   testWidgets('ProfileEditPage: 表单校验与保存资料', (tester) async {

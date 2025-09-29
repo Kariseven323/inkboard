@@ -1,0 +1,1 @@
+Added tests to raise filtered coverage over 90%: new tests for RecycleBinPage widget flows (empty state, restore, purge), UserProfileRepositoryImpl CRUD against in-memory Drift DB, and SoftDeleteDiaryEntryUseCase branches. Full suite passes; scripts/coverage.sh --filter-only reports Filtered: 90.23% on 2025-09-30.

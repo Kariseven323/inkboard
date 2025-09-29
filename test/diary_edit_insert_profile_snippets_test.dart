@@ -33,7 +33,7 @@ class _FakeUserProfileRepo implements UserProfileRepository {
 }
 
 void main() {
-  Future<void> _pumpEditor(WidgetTester tester) async {
+  Future<void> pumpEditor(WidgetTester tester) async {
     await getIt.reset();
     getIt.registerSingleton<UserProfileRepository>(_FakeUserProfileRepo());
 
@@ -56,7 +56,7 @@ void main() {
   }
 
   testWidgets('插入资料：昵称插入到光标处', (tester) async {
-    await _pumpEditor(tester);
+    await pumpEditor(tester);
 
     final contentField = find.byType(TextFormField).last;
     await tester.tap(contentField);
@@ -73,4 +73,3 @@ void main() {
     expect(textField.controller!.text.contains('昵称X'), isTrue);
   });
 }
-
